@@ -20,12 +20,20 @@ pos = -1
 
 tokenType = ["keyword","operator","delimiter"] # ,"integer_number","identifier","punctuator"]
 
-tokens = [
+reservedWords = ["class", "constructor", "method", "function",  # Program Components
+                "int", "boolean", "char", "void",               # Primitive Types
+                "var", "static", "field",                       # Variable Declarations
+                "let", "do", "if", "else", "while", "return",   # Statements
+                "true", "false", "null",                        # Constant Values
+                "this"                                          # Objective Reference 
+                ]
 
-        ["static", "field", "constructor", "method", "function"], # Keywords
+tokens = [
+        reservedWords, # Keywords
         ["+","-","*","**","/","//","%","@","<<",">>","&","|","^","~","<",">","<=",">=","==","!="], # Operators
         ["(",")","[","]","{","}",",",":",".",";","@","=","->","+=","-=","*=","/=","//=","%=","@=","&=","|=","^=",">>=","<<=","**="] # Delimeters
         ]
+
 
 
 
@@ -118,9 +126,9 @@ def peekNextToken():
     '''When this function is called it will return the next available token in the input stream, but the token is not consumed (i.e. it will stay in the input). So, the next time the parser calls GetNextToken, or PeekNextToken, it gets this same token.'''
     global pos
 
-    posTemp = pos               # Save Current State of Pointer   
+    # posTemp = pos               # Save Current State of Pointer   
     nextToken = getNextToken()  # Get Next Token
-    pos = posTemp               # Revert Pointer state
+    # pos = posTemp               # Revert Pointer state
     return nextToken            # Return Token
 
 

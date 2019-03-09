@@ -159,7 +159,7 @@ def expr():
     term()
     token = MyLexer.peekNextToken()
     while (token[1] == "+" or token[1] == "-"):
-        MyLexer.GetNextToken() # consume the + or -
+        MyLexer.getNextToken() # consume the + or -
         term()
         token = MyLexer.peekNextToken()
 
@@ -169,15 +169,15 @@ def term():
     factor()
     token = MyLexer.peekNextToken()
     while (token[1] == "*" or token[1] == "/"):
-        MyLexer.GetNextToken() # consume the * or /
+        MyLexer.getNextToken() # consume the * or /
         factor()
         token = MyLexer.peekNextToken()
 
 
 # factor -> int | id | ( expr )
 def factor():
-    token = MyLexer.GetNextToken()
-    if (token[0] == Token.TokenTypes.Identifier):
+    token = MyLexer.getNextToken()
+    if (token[0] == "keyword"): # token[0] == Token.TokenTypes.Identifier
         OK(token) # be happy
 
 
