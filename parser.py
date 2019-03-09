@@ -7,8 +7,41 @@ note:
 '''
 
 
+
+
 def Error(*args):
     print(args)
+
+
+
+
+def Init(file_name):
+    pass
+
+    # if (!MyLexer.Init(file_name)):
+    #     print("Unable to init the lexer")
+    # else:
+    #     print("Parser Initialized ")
+
+
+
+def OK(token):
+    print(token[1] + ": OK " )
+        
+    token = MyLexer.peekNextToken()
+    while (token[0] != "EOF"):
+        stmt()
+        token = MyLexer.peekNextToken()
+        
+
+
+def banProg():
+
+    token = MyLexer.peekNextToken ()
+    while (token[0] != "EOF"):
+        stmt()
+        token = MyLexer.peekNextToken()
+
 
 
 
@@ -25,7 +58,7 @@ def stmt():
     elif (token[1] == "banana"):
         banStmt()
     else:
-        Error(t, "unknown keyword")
+        Error(token, "unknown keyword")
 
 
 
@@ -124,21 +157,21 @@ def banStmt():
 # expr --> term { (+|-) term }
 def expr():
     term()
-    token = MyLexer.PeekNextToken()
+    token = MyLexer.peekNextToken()
     while (token[1] == "+" or token[1] == "-"):
         MyLexer.GetNextToken() # consume the + or -
         term()
-        token = MyLexer.PeekNextToken()
+        token = MyLexer.peekNextToken()
 
 
 # // term --> factor { (*|/) factor}
 def term():
     factor()
-    token = MyLexer.PeekNextToken()
+    token = MyLexer.peekNextToken()
     while (token[1] == "*" or token[1] == "/"):
         MyLexer.GetNextToken() # consume the * or /
         factor()
-        token = MyLexer.PeekNextToken()
+        token = MyLexer.peekNextToken()
 
 
 # factor -> int | id | ( expr )
@@ -146,3 +179,6 @@ def factor():
     token = MyLexer.GetNextToken()
     if (token[0] == Token.TokenTypes.Identifier):
         OK(token) # be happy
+
+
+banProg()
