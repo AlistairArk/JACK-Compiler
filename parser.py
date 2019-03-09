@@ -31,10 +31,10 @@ def stmt():
 
 
 def varDeclar():
-    token = MyLexer.getNextToken();
+    token = MyLexer.getNextToken()
 
     if (token[1] == "given"):
-        OK(token); # be happy
+        OK(token) # be happy
     else:
         Error(token, "'given' expected")
     
@@ -50,12 +50,12 @@ def varDeclar():
 
 
 def printStmt():
-    token = MyLexer.GetNextToken();
+    token = MyLexer.GetNextToken()
     if (token[1] == "print"):
         OK(token)  # be happy
     else:
-        Error(token, "'print' expected");
-    expr();
+        Error(token, "'print' expected")
+    expr()
 
 
 
@@ -63,7 +63,26 @@ def printStmt():
 
 
 def assignStmt():
-    pass
+    token = MyLexer.GetNextToken()
+    if (token[1] == "assign"):
+        OK(token) # be happy
+    else:
+        Error(token, "'assign' expected")
+        
+    expr()
+
+    token = MyLexer.GetNextToken()
+    if (token[1] == "to"):
+        OK(token) # be happy
+    else:
+        Error(token, "'to' expected")
+
+    token = MyLexer.GetNextToken()
+    if (token[0] == Token.TokenTypes.Identifier):
+        OK(token) # be happy
+    else:
+        Error(token, "an identifier is expected")
+
 
 def repeatStmt():
     pass
