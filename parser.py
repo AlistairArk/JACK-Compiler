@@ -111,8 +111,21 @@ def repeatStmt():
 
 def banStmt():
     token = MyLexer.getNextToken()
-    if (token[1] == "banana")
+    if (token[1] == "banana"):
         OK(token) # be happy
-    else
+    else:
         Error(token, "'banana' expected")
 
+
+
+
+
+
+# expr --> term { (+|-) term }
+def expr():
+    term()
+    token = MyLexer.PeekNextToken()
+    while (token[1] == "+" or token[1] == "-"):
+        MyLexer.GetNextToken() # consume the + or -
+        term()
+        token = MyLexer.PeekNextToken()
