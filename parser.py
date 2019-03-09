@@ -110,4 +110,9 @@ def repeatStmt():
 
 
 def banStmt():
-    pass
+    token = MyLexer.GetNextToken()
+    if (token[1] == "banana")
+        OK(token) # be happy
+    else
+        Error(token, "'banana' expected")
+
