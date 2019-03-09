@@ -1,8 +1,5 @@
 
-
-
-
-
+import lexer as MyLexer
 
 
 
@@ -10,16 +7,16 @@
 
 
 def stmt():
-    Token t = MyLexer.PeekNextToken()
-    if (t.Lexeme == "given"):
+    token = MyLexer.PeekNextToken()
+    if (token[1] == "given"):
         varDeclar()
-    elif (t.Lexeme == "print"):
+    elif (token[1] == "print"):
         printStmt()
-    elif (t.Lexeme == "assign"):
+    elif (token[1] == "assign"):
         assignStmt()
-    elif (t.Lexeme == "repeat"):
+    elif (token[1] == "repeat"):
         repeatStmt()
-    elif (t.Lexeme == "banana"):
+    elif (token[1] == "banana"):
         banStmt()
     else:
         Error(t, "unknown keyword")
@@ -28,17 +25,32 @@ def stmt():
 
 
 def varDeclar():
-    pass
+    token = MyLexer.getNextToken();
+
+    if (token[1] == "given")
+        OK(token); # be happy
+    else
+        Error(token, "'given' expected")
     
+    token = MyLexer.getNextToken()
+
+
+    if (token[0] == Token.TokenTypes.Identifier):
+        OK(token) # be happy
+    else:
+        Error(token, "an identifier is expected")
+
+
+
+
 def printStmt():
     pass
-    
+
 def assignStmt():
     pass
-    
+
 def repeatStmt():
     pass
-    
+
 def banStmt():
     pass
-    

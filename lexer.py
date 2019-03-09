@@ -11,7 +11,7 @@ properly without any issues.
 
 
 
-# file = list(shlex.shlex(open("source.jack", "r").read())) # Loads the test file
+# # file = list(shlex.shlex(open("source.jack", "r").read())) # Loads the test file
 file = open("source.jack", "r").read()+" " # Loads the test file
 fileLen = len(file)
 pos = -1
@@ -133,4 +133,4 @@ def main():
         print("".join(word.ljust(20) for word in token)) # print token
         token = getNextToken()
 
-main()
+# main()
