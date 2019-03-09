@@ -28,10 +28,21 @@ reservedWords = ["class", "constructor", "method", "function",  # Program Compon
                 "this"                                          # Objective Reference 
                 ]
 
+symbols =  ["(",")",   # Used for grouping arethmetic expressions and enclosing parameter-lists and argument-lists
+            "[","]",   # Used for array indexing
+            "{","}",   # Used for grouping program units and statements
+            ",",       # Variable list seperatior
+            ";",       # Statement terminator
+            "=",       # Assignment and comparison operator
+            "."        # Class membership
+            ]
+
+operators = ["+","-","*","/","&","|","~","<",">"]
+
 tokens = [
         reservedWords, # Keywords
-        ["+","-","*","**","/","//","%","@","<<",">>","&","|","^","~","<",">","<=",">=","==","!="], # Operators
-        ["(",")","[","]","{","}",",",":",".",";","@","=","->","+=","-=","*=","/=","//=","%=","@=","&=","|=","^=",">>=","<<=","**="] # Delimeters
+        operators, # Operators
+        symbols # Delimeters
         ]
 
 
