@@ -13,7 +13,7 @@ def Error(*args):
 
 
 def stmt():
-    token = MyLexer.PeekNextToken()
+    token = MyLexer.peekNextToken()
     if (token[1] == "given"):
         varDeclar()
     elif (token[1] == "print"):
@@ -50,7 +50,7 @@ def varDeclar():
 
 
 def printStmt():
-    token = MyLexer.GetNextToken()
+    token = MyLexer.getNextToken()
     if (token[1] == "print"):
         OK(token)  # be happy
     else:
@@ -63,7 +63,7 @@ def printStmt():
 
 
 def assignStmt():
-    token = MyLexer.GetNextToken()
+    token = MyLexer.getNextToken()
     if (token[1] == "assign"):
         OK(token) # be happy
     else:
@@ -71,13 +71,13 @@ def assignStmt():
 
     expr()
 
-    token = MyLexer.GetNextToken()
+    token = MyLexer.getNextToken()
     if (token[1] == "to"):
         OK(token) # be happy
     else:
         Error(token, "'to' expected")
 
-    token = MyLexer.GetNextToken()
+    token = MyLexer.getNextToken()
     if (token[0] == Token.TokenTypes.Identifier):
         OK(token) # be happy
     else:
@@ -85,7 +85,7 @@ def assignStmt():
 
 
 def repeatStmt():
-    token = MyLexer.GetNextToken()
+    token = MyLexer.getNextToken()
     if (token[1] == "repeat"):
         OK(token) # be happy
     else:
@@ -93,24 +93,24 @@ def repeatStmt():
 
     expr()
 
-    token = MyLexer.GetNextToken()
+    token = MyLexer.getNextToken()
     if (token[1] == "times"):
         OK(token) # be happy
     else:
         Error(token, "'times' expected")
 
-    token = MyLexer.PeekNextToken()
+    token = MyLexer.peekNextToken()
     while (token[1] != ""):
         stmt()
-        token = MyLexer.PeekNextToken()
+        token = MyLexer.peekNextToken()
 
-    MyLexer.GetNextToken() # consume the 
+    MyLexer.getNextToken() # consume the 
 
 
 
 
 def banStmt():
-    token = MyLexer.GetNextToken()
+    token = MyLexer.getNextToken()
     if (token[1] == "banana")
         OK(token) # be happy
     else
