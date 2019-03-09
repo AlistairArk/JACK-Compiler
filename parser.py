@@ -1,8 +1,14 @@
 
 import lexer as MyLexer
+'''
+note:
+    token[0] = type
+    token[1] = lexeme
+'''
 
 
-
+def Error(*args):
+    print(args)
 
 
 
@@ -27,9 +33,9 @@ def stmt():
 def varDeclar():
     token = MyLexer.getNextToken();
 
-    if (token[1] == "given")
+    if (token[1] == "given"):
         OK(token); # be happy
-    else
+    else:
         Error(token, "'given' expected")
     
     token = MyLexer.getNextToken()
@@ -44,7 +50,17 @@ def varDeclar():
 
 
 def printStmt():
-    pass
+    token = MyLexer.GetNextToken();
+    if (token[1] == "print"):
+        OK(token)  # be happy
+    else:
+        Error(token, "'print' expected");
+    expr();
+
+
+
+
+
 
 def assignStmt():
     pass
