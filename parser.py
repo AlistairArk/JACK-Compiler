@@ -1,5 +1,6 @@
 
-import lexer as MyLexer
+import lexer
+
 '''
 note:
     token[0] = type
@@ -18,7 +19,7 @@ def Error(*args):
 def Init(file_name):
     pass
 
-    # if (!MyLexer.Init(file_name)):
+    # if (!lexer.Init(file_name)):
     #     print("Unable to init the lexer")
     # else:
     #     print("Parser Initialized ")
@@ -28,35 +29,49 @@ def Init(file_name):
 def OK(token):
     print(token[1] + ": OK " )
         
-    token = MyLexer.peekNextToken()
+    token = lexer.peekNextToken()
     while (token[0] != "EOF"):
         stmt()
-        token = MyLexer.peekNextToken()
+        token = lexer.peekNextToken()
         
 
 
 def banProg():
 
-    token = MyLexer.peekNextToken ()
+    token = lexer.peekNextToken ()
     while (token[0] != "EOF"):
         stmt()
-        token = MyLexer.peekNextToken()
+        token = lexer.peekNextToken()
+
+
+
+
+
+
+keywords = {"keyword":func,
+            "operator":func,
+            "symbol":func}
 
 
 
 
 def stmt():
-    token = MyLexer.peekNextToken()
-    if (token[1] == "given"):
-        varDeclar()
-    elif (token[1] == "print"):
-        printStmt()
-    elif (token[1] == "assign"):
-        assignStmt()
-    elif (token[1] == "repeat"):
-        repeatStmt()
-    elif (token[1] == "banana"):
-        banStmt()
+    
+    token = lexer.peekNextToken()
+    
+    if token[1] in lexer.keywords:
+        if (token[1] == "given"):
+            varDeclar()
+        elif (token[1] == "print"):
+            printStmt()
+        elif (token[1] == "assign"):
+            assignStmt()
+        elif (token[1] == "repeat"):
+            repeatStmt()
+        elif (token[1] == "banana"):
+            banStmt()
+        else:
+            Error(token, "keyword not implimented")
     else:
         Error(token, "unknown keyword")
 
@@ -64,14 +79,14 @@ def stmt():
 
 
 def varDeclar():
-    token = MyLexer.getNextToken()
+    token = lexer.getNextToken()
 
     if (token[1] == "given"):
         OK(token) # be happy
     else:
         Error(token, "'given' expected")
     
-    token = MyLexer.getNextToken()
+    token = lexer.getNextToken()
 
 
     if (token[0] == Token.TokenTypes.Identifier):
@@ -83,7 +98,7 @@ def varDeclar():
 
 
 def printStmt():
-    token = MyLexer.getNextToken()
+    token = lexer.getNextToken()
     if (token[1] == "print"):
         OK(token)  # be happy
     else:
@@ -96,7 +111,7 @@ def printStmt():
 
 
 def assignStmt():
-    token = MyLexer.getNextToken()
+    token = lexer.getNextToken()
     if (token[1] == "assign"):
         OK(token) # be happy
     else:
@@ -104,13 +119,13 @@ def assignStmt():
 
     expr()
 
-    token = MyLexer.getNextToken()
+    token = lexer.getNextToken()
     if (token[1] == "to"):
         OK(token) # be happy
     else:
         Error(token, "'to' expected")
 
-    token = MyLexer.getNextToken()
+    token = lexer.getNextToken()
     if (token[0] == Token.TokenTypes.Identifier):
         OK(token) # be happy
     else:
@@ -118,7 +133,7 @@ def assignStmt():
 
 
 def repeatStmt():
-    token = MyLexer.getNextToken()
+    token = lexer.getNextToken()
     if (token[1] == "repeat"):
         OK(token) # be happy
     else:
@@ -126,24 +141,24 @@ def repeatStmt():
 
     expr()
 
-    token = MyLexer.getNextToken()
+    token = lexer.getNextToken()
     if (token[1] == "times"):
         OK(token) # be happy
     else:
         Error(token, "'times' expected")
 
-    token = MyLexer.peekNextToken()
+    token = lexer.peekNextToken()
     while (token[1] != ""):
         stmt()
-        token = MyLexer.peekNextToken()
+        token = lexer.peekNextToken()
 
-    MyLexer.getNextToken() # consume the 
+    lexer.getNextToken() # consume the 
 
 
 
 
 def banStmt():
-    token = MyLexer.getNextToken()
+    token = lexer.getNextToken()
     if (token[1] == "banana"):
         OK(token) # be happy
     else:
@@ -157,26 +172,26 @@ def banStmt():
 # expr --> term { (+|-) term }
 def expr():
     term()
-    token = MyLexer.peekNextToken()
+    token = lexer.peekNextToken()
     while (token[1] == "+" or token[1] == "-"):
-        MyLexer.getNextToken() # consume the + or -
+        lexer.getNextToken() # consume the + or -
         term()
-        token = MyLexer.peekNextToken()
+        token = lexer.peekNextToken()
 
 
 # // term --> factor { (*|/) factor}
 def term():
     factor()
-    token = MyLexer.peekNextToken()
+    token = lexer.peekNextToken()
     while (token[1] == "*" or token[1] == "/"):
-        MyLexer.getNextToken() # consume the * or /
+        lexer.getNextToken() # consume the * or /
         factor()
-        token = MyLexer.peekNextToken()
+        token = lexer.peekNextToken()
 
 
 # factor -> int | id | ( expr )
 def factor():
-    token = MyLexer.getNextToken()
+    token = lexer.getNextToken()
     if (token[0] == "keyword"): # token[0] == Token.TokenTypes.Identifier
         OK(token) # be happy
 

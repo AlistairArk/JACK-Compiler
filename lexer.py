@@ -18,15 +18,15 @@ pos = -1
 
 
 
-tokenType = ["keyword","operator","delimiter"] # ,"integer_number","identifier","punctuator"]
+tokenType = ["keyword","operator","symbol"] # ,"integer_number","identifier","punctuator"]
 
-reservedWords = ["class", "constructor", "method", "function",  # Program Components
-                "int", "boolean", "char", "void",               # Primitive Types
-                "var", "static", "field",                       # Variable Declarations
-                "let", "do", "if", "else", "while", "return",   # Statements
-                "true", "false", "null",                        # Constant Values
-                "this"                                          # Objective Reference 
-                ]
+keywords = ["class", "constructor", "method", "function",  # Program Components
+            "int", "boolean", "char", "void",               # Primitive Types
+            "var", "static", "field",                       # Variable Declarations
+            "let", "do", "if", "else", "while", "return",   # Statements
+            "true", "false", "null",                        # Constant Values
+            "this"                                          # Objective Reference 
+            ]
 
 symbols =  ["(",")",   # Used for grouping arethmetic expressions and enclosing parameter-lists and argument-lists
             "[","]",   # Used for array indexing
@@ -40,9 +40,9 @@ symbols =  ["(",")",   # Used for grouping arethmetic expressions and enclosing 
 operators = ["+","-","*","/","&","|","~","<",">"]
 
 tokens = [
-        reservedWords, # Keywords
-        operators, # Operators
-        symbols # Delimeters
+        keywords,       # Keywords
+        operators,      # Operators
+        symbols         # Symbol
         ]
 
 
