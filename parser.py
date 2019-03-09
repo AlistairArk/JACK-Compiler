@@ -139,3 +139,10 @@ def term():
         MyLexer.GetNextToken() # consume the * or /
         factor()
         token = MyLexer.PeekNextToken()
+
+
+# factor -> int | id | ( expr )
+def factor():
+    token = MyLexer.GetNextToken()
+    if (token[0] == Token.TokenTypes.Identifier):
+        OK(token) # be happy
