@@ -129,3 +129,13 @@ def expr():
         MyLexer.GetNextToken() # consume the + or -
         term()
         token = MyLexer.PeekNextToken()
+
+
+# // term --> factor { (*|/) factor}
+def term():
+    factor()
+    token = MyLexer.PeekNextToken()
+    while (token[1] == "*" or token[1] == "/"):
+        MyLexer.GetNextToken() # consume the * or /
+        factor()
+        token = MyLexer.PeekNextToken()
