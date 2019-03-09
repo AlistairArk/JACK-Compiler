@@ -68,7 +68,7 @@ def assignStmt():
         OK(token) # be happy
     else:
         Error(token, "'assign' expected")
-        
+
     expr()
 
     token = MyLexer.GetNextToken()
@@ -85,7 +85,29 @@ def assignStmt():
 
 
 def repeatStmt():
-    pass
+    token = MyLexer.GetNextToken()
+    if (token[1] == "repeat"):
+        OK(token) # be happy
+    else:
+        Error(token, "'repeat' expected")
+
+    expr()
+
+    token = MyLexer.GetNextToken()
+    if (token[1] == "times"):
+        OK(token) # be happy
+    else:
+        Error(token, "'times' expected")
+
+    token = MyLexer.PeekNextToken()
+    while (token[1] != ""):
+        stmt()
+        token = MyLexer.PeekNextToken()
+
+    MyLexer.GetNextToken() # consume the 
+
+
+
 
 def banStmt():
     pass
