@@ -37,6 +37,9 @@ symbols =  ["(",")",   # Used for grouping arethmetic expressions and enclosing 
             "."        # Class membership
             ]
 
+# JACK - Standard Library
+functions = [""]
+
 operators = ["+","-","*","/","&","|","~","<",">"]
 
 tokens = [

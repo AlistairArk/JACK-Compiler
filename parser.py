@@ -56,14 +56,12 @@ def stmt():
     
     token = lexer.getNextToken()
     
-    if token[0] in lexer.keywords:
 
-        data = call_dict[token[0]](token)
-
-        if data[0]:
-            OK(token) # Accept the token
+    if token[0] in "keyword":        
+        if token[1] in lexer.keywords:        
+            OK(token) # be happy
         else:
-            Error(token, data[1])
+            Error(token, "unknown keyword")
 
     elif token[0] in "symbol":        
         if token[1] in lexer.symbols:        
@@ -77,29 +75,14 @@ def stmt():
         else:
             Error(token, "unknown operator")
   
+    elif token[0] in lexer.keywords:
+        data = call_dict[token[0]](token)
+        if data[0]:
+            OK(token) # Accept the token
+        else:
+            Error(token, data[1])
 
 
-
-        # if (token[1] == "given"):
-        #     varDeclar()
-        # elif (token[1] == "print"):
-        #     printStmt()
-        # elif (token[1] == "assign"):
-        #     assignStmt()
-        # elif (token[1] == "repeat"):
-        #     repeatStmt()
-        # elif (token[1] == "banana"):
-        #     banStmt()
-
-
-        # elif (token[1] == "keyword"):
-        #     keyword()
-        # elif (token[1] == "operator"):
-        #     operator()
-        # elif (token[1] == "symbol"):
-        #     symbol()
-        # else:
-        #     Error(token, "keyword not implimented")
     else:
         Error(token, "unknown token")
 
