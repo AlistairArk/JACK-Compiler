@@ -38,7 +38,7 @@ symbols =  ["(",")",   # Used for grouping arethmetic expressions and enclosing 
             ]
 
 # JACK - Standard Library
-functions = [""]
+stdlib = ["Math","String","Array","Output","Screen","Memory","Keyboard","Sys"]
 
 operators = ["+","-","*","/","&","|","~","<",">"]
 
@@ -121,7 +121,7 @@ def getNextToken():
         while file[pos].isdigit():
             lexeme+=file[pos]
             pos+=1
-        return ["integer_number",lexeme] 
+        return ["number",lexeme] 
 
     
     # C must be a symbol (since it is not a letter nor digit), tokenize it and return the token
