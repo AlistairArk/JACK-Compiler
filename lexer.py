@@ -128,8 +128,11 @@ def getNextToken():
         if C in tokens[i]:
             return [tokenType[i],C] 
 
-
-    return ["symbol",C.replace("\n","\\n")]
+    if C = "\n":
+        pass # incriment line counter
+        return getNextToken() # Get next token
+    else:
+        return ["symbol",C]
         
     
 
@@ -137,9 +140,9 @@ def peekNextToken():
     '''When this function is called it will return the next available token in the input stream, but the token is not consumed (i.e. it will stay in the input). So, the next time the parser calls GetNextToken, or PeekNextToken, it gets this same token.'''
     global pos
 
-    # posTemp = pos               # Save Current State of Pointer   
+    posTemp = pos               # Save Current State of Pointer   
     nextToken = getNextToken()  # Get Next Token
-    # pos = posTemp               # Revert Pointer state
+    pos = posTemp               # Revert Pointer state
     return nextToken            # Return Token
 
 

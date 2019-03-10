@@ -48,10 +48,6 @@ def banProg():
 
 
 
-keywords = {"keyword":func,
-            "operator":func,
-            "symbol":func}
-
 
 
 
@@ -59,7 +55,7 @@ def stmt():
     
     token = lexer.peekNextToken()
     
-    if token[1] in lexer.keywords:
+    if token[0] in lexer.keywords:
         if (token[1] == "given"):
             varDeclar()
         elif (token[1] == "print"):
@@ -70,11 +66,38 @@ def stmt():
             repeatStmt()
         elif (token[1] == "banana"):
             banStmt()
+
+
+        elif (token[1] == "keyword"):
+            keyword()
+        elif (token[1] == "operator"):
+            operator()
+        elif (token[1] == "symbol"):
+            symbol()
         else:
             Error(token, "keyword not implimented")
     else:
         Error(token, "unknown keyword")
 
+
+def keyword():
+    token = lexer.getNextToken()
+    if (token[1] == "print"):
+        OK(token)  # be happy
+
+def operator():
+    token = lexer.getNextToken()
+    if (token[1] == "print"):
+        OK(token)  # be happy
+
+def symbol():
+    token = lexer.getNextToken()
+    if (token[1] == "print"):
+        OK(token)  # be happy
+
+keywords = {"keyword":keyword,
+            "operator":operator,
+            "symbol":symbol}
 
 
 
