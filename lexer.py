@@ -21,11 +21,11 @@ pos = -1
 tokenType = ["keyword","operator","symbol"] # ,"integer_number","identifier","punctuator"]
 
 keywords = ["class", "constructor", "method", "function",  # Program Components
-            "int", "boolean", "char", "void",               # Primitive Types
-            "var", "static", "field",                       # Variable Declarations
-            "let", "do", "if", "else", "while", "return",   # Statements
-            "true", "false", "null",                        # Constant Values
-            "this"                                          # Objective Reference 
+            "int", "boolean", "char", "void",              # Primitive Types
+            "var", "static", "field",                      # Variable Declarations
+            "let", "do", "if", "else", "while", "return",  # Statements
+            "true", "false", "null",                       # Constant Values
+            "this"                                         # Objective Reference 
             ]
 
 symbols =  ["(",")",   # Used for grouping arethmetic expressions and enclosing parameter-lists and argument-lists
@@ -128,7 +128,7 @@ def getNextToken():
         if C in tokens[i]:
             return [tokenType[i],C] 
 
-    if C = "\n":
+    if C == "\n":
         pass # incriment line counter
         return getNextToken() # Get next token
     else:
