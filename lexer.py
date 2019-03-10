@@ -54,7 +54,7 @@ tokens = [
 
 def getNextToken():
     ''' Token GetNextToken(). Whenever this function is called it will return the next available token from the input stream, and the token is removed from the input (i.e. consumed).'''
-    global pos
+    global pos,lineNum
 
 
     # Skip any white space characters until you hit the first non-whitespace character (call it C).
@@ -131,7 +131,7 @@ def getNextToken():
     for i in range(len(tokenType)):
 
         if C in tokens[i]:
-            return [tokenType[i],C] 
+            return [tokenType[i],C,lineNum] 
 
     if C == "\n":
         lineNum+=1 # incriment line counter
@@ -157,7 +157,8 @@ def main():
     
     token = getNextToken()
     while (token[0] != "EOF"):
-        print("".join(word.ljust(20) for word in token)) # print token
+
+        print("".join(str(word).ljust(20) for word in token)) # print token
         token = getNextToken()
 
-# main()
+main()
