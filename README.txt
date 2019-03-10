@@ -1,8 +1,10 @@
-Assignment: Milestone 1. Lexical Analysis
+Assignment: Milestone 2. The Parser
 
-So far, I have created a lexer which successfully removes white space and comments from the input file 
-and correctly extracts all the tokens of the source code. It does not crash or become unstable if the 
-source file contains any kind of lexical errors. 
+So far, I have created a lexer and Parser. The two components have been conected together and function properly with one another. 
+The program does not crash or become unstable if the source file contains any kind of lexical errors, and if there are any the parser succesfully flags them where necessary. 
 
-The lexer has been tested using the provided JACK source files and is shown to function 
-properly without any issues. 
+Both the lexer and parser have been tested using the provided JACK source files and are shown to function properly without any issues. 
+
+
+
+

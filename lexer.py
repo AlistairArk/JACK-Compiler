@@ -15,7 +15,7 @@ properly without any issues.
 file = open("source.jack", "r").read()+" " # Loads the test file
 fileLen = len(file)
 pos = -1
-
+lineNum = 0
 
 
 tokenType = ["keyword","operator","symbol"] # ,"integer_number","identifier","punctuator"]
@@ -73,6 +73,8 @@ def getNextToken():
         while file[pos]!="\n":
             string+=file[pos]
             pos+=1
+            if file[pos] == "\n":
+                lineNum+=1
         pos+=1 # Jump 1 to remove newline (\n)
         return getNextToken() # go back to 1.
     
@@ -94,7 +96,7 @@ def getNextToken():
             lexeme+=file[pos]
             pos+=1
         pos+=1 # Jump 1 to remove " character
-        return ["string_literal",lexeme]
+        return ["string_literal",lexeme,lineNum]
 
 
     # If C is a letter, it may be the first letter in a keyword or identifier, then: 
@@ -108,9 +110,9 @@ def getNextToken():
             pos+=1
 
         if lexeme in tokens[tokenType.index("keyword")]:
-            return ["keyword",lexeme]
+            return ["keyword",lexeme,lineNum]
         else:
-            return ["id",lexeme]
+            return ["id",lexeme,lineNum]
 
 
     # If C is a digit, it may be the first digit in a number, then:
@@ -121,7 +123,7 @@ def getNextToken():
         while file[pos].isdigit():
             lexeme+=file[pos]
             pos+=1
-        return ["number",lexeme] 
+        return ["number",lexeme,lineNum] 
 
     
     # C must be a symbol (since it is not a letter nor digit), tokenize it and return the token
@@ -132,10 +134,10 @@ def getNextToken():
             return [tokenType[i],C] 
 
     if C == "\n":
-        pass # incriment line counter
+        lineNum+=1 # incriment line counter
         return getNextToken() # Get next token
     else:
-        return ["symbol",C]
+        return ["symbol",C,lineNum]
         
     
 
