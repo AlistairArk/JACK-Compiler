@@ -161,4 +161,4 @@ def main():
         print("".join(str(word).ljust(20) for word in token)) # print token
         token = getNextToken()
 
-main()
+# main()
