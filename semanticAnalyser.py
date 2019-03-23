@@ -6,9 +6,28 @@ import lexer
 symbolTable = [[], [], [], []]
 
 
+# JACK - Standard Library (Built in functions)
+stdlib = [ "Math",          "init","abs","multiply","divide","min","max","sqrt",
+           "String",        "dispose","length","charAt","setCharAt","appendChar","eraseLastChar","intValue","setInt","backSpace","doubleQuote","newLine",
+           "Array",         "new","dispose",
+           "Output",        "moveCursor","printChar","printString","printInt","println","backSpace",
+           "Screen",        "clearScreen","setColor","drawPixel","drawLine","drawRectangle","drawCircle",
+           "Memory",        "peek","poke","alloc","deAlloc",
+           "Keyboard",      "keyPressed","readChar","readLine","readInt",
+           "Sys",           "halt","error","wait"]
+
 
 def addSymbol(*args,**kwargs):
-    pass
+    symbolTable[0].append(kwargs.get("type",0))
+    symbolTable[1].append(kwargs.get("symbol",0))
+    symbolTable[2].append(kwargs.get("flag",0))
+
+def idExists(token):
+    if token[1] in symbolTable[1]:
+        return 1
+    else:
+        return 0
+
 
 
 
@@ -22,25 +41,18 @@ function  = 0    # Detects when the program is in a function
 parentheses = 0  # 
 semicolon = 0    # 
 
+
+
+stack = []
+
 def main(token):
-
-    if token[0] == "class":
-        if classFlag:
-            Error(token, "cannot nest class inside a class")
-        else:
-            classFlag = 1
-            symbolTable[0].append("class")
-            symbolTable[1].append(token[1])
-            symbolTable[2].append(1)
+    global classFlag, function, parentheses, semicolon
+    stack.append(token)
 
 
-    elif token[0] == "method": # Store a list of functions each time one is declared
-        function = 1
-        symbolTable[0].append("function")
-        symbolTable[1].append(token[1])
-        symbolTable[2].append(1)
 
-    elif token[0] == "{": 
+
+    if token[0] == "{": 
         semicolon += 1
     elif token[0] == "}": 
         semicolon -= 1
@@ -54,6 +66,34 @@ def main(token):
         parentheses -= 1
         if semicolon==-1:
             Error(token, "mismatched number of parentheses")
+
+
+    elif token[0] == "id":
+        if token[1] in stdlib:
+            pass
+        else:
+            if stack[-2][1] == "class":
+                if classFlag:
+                    Error(token, "cannot nest class inside a class")
+                else:
+                    classFlag = 1
+                    addSymbol(type="class", symbol=token[1], flag=1)
+
+            elif stack[-2][1] == "method"or stack[-2][1] == "constructor": # Store a list of functions each time one is declared
+                function = 1
+                addSymbol(type="function", symbol=token[1], flag=1)
+
+            # if this is a declaration
+            # if stack[-3][1]=="var" and (stack[-2][1]=="int" or stack[-2][1]=="str") :
+            elif (stack[-2][1]=="int" or stack[-2][1]=="str") :
+                addSymbol(type="var", symbol=token[1], flag=1)
+
+            elif idExists(token):    # if token was declared
+                pass
+
+            else:
+                print(symbolTable)
+                Error(token, "undeclared id")
 
 
     '''
