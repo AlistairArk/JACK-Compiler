@@ -1,5 +1,5 @@
 
-import lexer, semanticAnalyser
+import lexer
 
 def Class(token):
     return [1]
@@ -76,7 +76,7 @@ def If(token):
 
         while bracketOpenCount:
             token = lexer.getNextToken()
-            print(token)
+            # print(token)
 
 
             if token[1]=="(":

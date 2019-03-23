@@ -8,7 +8,7 @@ source file contains any kind of lexical errors.
 The lexer has been tested using the provided JACK source files and is shown to function 
 properly without any issues. 
 '''
-
+import semanticAnalyser
 
 
 # # file = list(shlex.shlex(open("source.jack", "r").read())) # Loads the test file
@@ -49,10 +49,13 @@ tokens = [
         ]
 
 
-
-
-
 def getNextToken():
+    token = consumeToken()
+    semanticAnalyser.main(token) # Peform semantic analysis while consuming tokens
+    return token
+
+
+def consumeToken():
     ''' Token GetNextToken(). Whenever this function is called it will return the next available token from the input stream, and the token is removed from the input (i.e. consumed).'''
     global pos,lineNum
 
@@ -76,14 +79,14 @@ def getNextToken():
             if file[pos] == "\n":
                 lineNum+=1
         pos+=1 # Jump 1 to remove newline (\n)
-        return getNextToken() # go back to 1.
+        return consumeToken() # go back to 1.
     
     if C == "/" and file[pos+1]=="*":# comment out /**
         pos+=1
         while file[pos]!="*" or file[pos+1]!="/":
             pos+=1
         pos+=1 # Jump 1 to remove end character (*/)
-        return getNextToken() # go back to 1. 
+        return consumeToken() # go back to 1. 
 
 
     # If C is a quote ("), it may be the start of a literal string, then:
@@ -135,7 +138,7 @@ def getNextToken():
 
     if C == "\n":
         lineNum+=1 # incriment line counter
-        return getNextToken() # Get next token
+        return consumeToken() # Get next token
     else:
         return ["symbol",C,lineNum]
         
@@ -146,7 +149,7 @@ def peekNextToken():
     global pos
 
     posTemp = pos               # Save Current State of Pointer   
-    nextToken = getNextToken()  # Get Next Token
+    nextToken = consumeToken()  # Get Next Token
     pos = posTemp               # Revert Pointer state
     return nextToken            # Return Token
 

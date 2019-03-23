@@ -8,9 +8,11 @@ symbolTable = [[], [], [], []]
 
 
 def addSymbol(*args,**kwargs):
+    pass
 
-
-def main():
+def main(token):
+    
+    print(token)
     '''
     Correct usage of variables
     - A variable has been declared before being used
