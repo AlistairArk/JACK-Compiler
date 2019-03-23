@@ -1,7 +1,7 @@
 
 import lexer
 
-#             type, symbol, declared flag, true
+#             type, symbol, declared flag
 
 symbolTable = [[], [], [], []]
 
@@ -10,15 +10,50 @@ symbolTable = [[], [], [], []]
 def addSymbol(*args,**kwargs):
     pass
 
+
+
+def Error(*args):
+    print("Error in line " + str(args[0][2]) + " at or near " + str(args[0][1])+ ", " + str(args[1]));
+
+
+
+classFlag = 0    # Detects when the program is in a class
+function  = 0    # Detects when the program is in a function
+parentheses = 0  # 
+semicolon = 0    # 
+
 def main(token):
-    token
 
     if token[0] == "class":
-        pass
+        if classFlag:
+            Error(token, "cannot nest class inside a class")
+        else:
+            classFlag = 1
+            symbolTable[0].append("class")
+            symbolTable[1].append(token[1])
+            symbolTable[2].append(1)
+
 
     elif token[0] == "method": # Store a list of functions each time one is declared
-        # print(token[0])
-        pass
+        function = 1
+        symbolTable[0].append("function")
+        symbolTable[1].append(token[1])
+        symbolTable[2].append(1)
+
+    elif token[0] == "{": 
+        semicolon += 1
+    elif token[0] == "}": 
+        semicolon -= 1
+        if semicolon==-1:
+            Error(token, "mismatched number of semicolons")
+
+
+    elif token[0] == "(": 
+        parentheses += 1
+    elif token[0] == ")": 
+        parentheses -= 1
+        if semicolon==-1:
+            Error(token, "mismatched number of parentheses")
 
 
     '''
