@@ -78,6 +78,7 @@ def If(token):
             token = lexer.getNextToken()
             print(token)
 
+
             if token[1]=="(":
                 bracketOpenCount+=1
             elif token[1]==")":
