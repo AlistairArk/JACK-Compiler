@@ -36,7 +36,7 @@ def Init(file_name):
 
 
 def OK(token):
-    print(token[1] + ": OK " )
+    # print(token[1] + ": OK " )
         
     token = lexer.peekNextToken()
     while (token[0] != "EOF"):
@@ -83,12 +83,14 @@ def stmt():
         else:
             Error(token, "unknown operator")
   
-    elif token[0] in "id":        
+    elif token[0] in "id": 
+        print(token[1])       
         OK(token) # be happy
         # if token[1] in lexer.operators:        
         #     OK(token) # be happy
         # else:
         #     Error(token, "unknown operator")
+
     elif token[0] in "number":        
         OK(token) # be happy
 
