@@ -1,4 +1,6 @@
 
+import lexer
+
 
 def Class(token):
     return [1]
@@ -71,6 +73,8 @@ def If(token):
     return [0, "'' expected"]
 
 def Else(token):
+    token = lexer.getNextToken()
+    print(token)
     return [1]
 
     return [0, "'' expected"]

@@ -64,12 +64,26 @@ def stmt():
     
     token = lexer.getNextToken()
     
+    if token[1]=="else":
+        print(token,"ahh")
 
-    if token[0] in "keyword":        
-        if token[1] in lexer.keywords:        
-            OK(token) # be happy
+
+
+    if token[0] == "keyword":        
+        print(token)
+        if token[0] in lexer.keywords:
+            data = keywords[token[0]](token)
+            
+        elif token[1] in lexer.keywords:        
+            data = keywords[token[1]](token)
         else:
             Error(token, "unknown keyword")
+
+        if data[0]:
+            OK(token) # Accept the token
+        else:
+            Error(token, data[1])
+
 
     elif token[0] in "symbol":        
         if token[1] in lexer.symbols:        
@@ -84,7 +98,7 @@ def stmt():
             Error(token, "unknown operator")
   
     elif token[0] in "id": 
-        print(token[1])       
+        # print(token)       
         OK(token) # be happy
         # if token[1] in lexer.operators:        
         #     OK(token) # be happy
@@ -97,12 +111,6 @@ def stmt():
     elif token[0] in "string_literal":        
         OK(token) # be happy
 
-    elif token[0] in lexer.keywords:
-        data = call_dict[token[0]](token)
-        if data[0]:
-            OK(token) # Accept the token
-        else:
-            Error(token, data[1])
 
 
     else:
