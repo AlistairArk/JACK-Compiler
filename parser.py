@@ -64,13 +64,11 @@ def stmt():
     
     token = lexer.getNextToken()
     
-    if token[1]=="else":
-        print(token,"ahh")
+
 
 
 
     if token[0] == "keyword":        
-        print(token)
         if token[0] in lexer.keywords:
             data = keywords[token[0]](token)
             

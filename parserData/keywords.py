@@ -1,6 +1,5 @@
 
-import lexer
-
+import lexer, semanticAnalyser
 
 def Class(token):
     return [1]
@@ -68,16 +67,35 @@ def do(token):
     return [0, "'' expected"]
 
 def If(token):
-    return [1]
+    token = lexer.getNextToken()
+    bracketOpenCount = 0
 
-    return [0, "'' expected"]
+    if token[1]=="(":
+        bracketOpenCount+=1 # Insure same number of bracket opens as closes
+
+
+        while bracketOpenCount:
+            token = lexer.getNextToken()
+            print(token)
+
+            if token[1]=="(":
+                bracketOpenCount+=1
+            elif token[1]==")":
+                bracketOpenCount-=1
+
+            if lexer.peekNextToken()[0] == "EOF":
+                return [0, "unexpected EOF, ')' expected"]
+
+        return [1]
+
+    else:
+        return [0, "'(' expected"]
 
 def Else(token):
-    token = lexer.getNextToken()
-    print(token)
-    return [1]
-
-    return [0, "'' expected"]
+    if lexer.getNextToken()[1]=="{":
+        return [1]
+    else:
+        return [0, "'{' expected"]
 
 def While(token):
     return [1]
