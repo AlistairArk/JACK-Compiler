@@ -50,7 +50,7 @@ class Fraction {
       do Output.printInt(numerator);
       do Output.printString("/");
       do Output.printInt(denominator);
-      return;
+
    }
 
    // Computes the greatest common divisor of the given integers.

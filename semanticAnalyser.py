@@ -7,14 +7,14 @@ symbolTable = [[],    [],        [],        []]
 
 
 # JACK - Standard Library (Built in functions)
-stdlib = [  ["Math"],
-            ["String"],
-            ["Array"],
-            ["Output"],
-            ["Screen"],
-            ["Memory"],
-            ["Keyboard"],
-            ["Sys"],
+stdlib = [  ["Math",
+            "String",
+            "Array",
+            "Output",
+            "Screen",
+            "Memory",
+            "Keyboard",
+            "Sys"],
 
             [["init","abs","multiply","divide","min","max","sqrt"],
             ["dispose","length","charAt","setCharAt","appendChar","eraseLastChar","intValue","setInt","backSpace","doubleQuote","newLine"],
@@ -80,7 +80,7 @@ functionStack = []
 def main(token):
     global classFlag, function, parentheses, semicolon
     stack.append(token)
-    print(token)
+    # print(token)
 
 
     if token[0] == "{": 
@@ -119,21 +119,26 @@ def main(token):
 
             
         
-        # First perform a check to ignore the following:
-        #     - library functions
         libFunction = 0
         if token[1] in stdlib[0]:
-            stdlibIndex = token[1].index(stdlib[0]) # Get index of token
-            token = lexer.peekNextToken()
+            # Perform a check to ignore the following library functions
 
+            stdlibIndex = stdlib[0].index(token[1]) # Get index of token
+            token = lexer.peekNextToken()
             if token[1] == ".":
                 token = lexer.peekNextToken()
                 if token[1] in stdlib[1][stdlibIndex]:
                     libFunction = 1
 
-        elif (stack[-2][1]=="method" or stack[-2][1]=="constructor"):
-            libFunction = 1
+                    # Consume Tokens
+                    lexer.getNextToken()
+                    lexer.getNextToken()
 
+
+
+        elif (stack[-2][1]=="method" or stack[-2][1]=="constructor"):
+            # Perform a check to ignore method & constructor keywords
+            libFunction = 1
 
         if not libFunction:
             if stack[-2][1] == "class":
@@ -169,13 +174,13 @@ def main(token):
                 #         // Detect function closing, ensure a return takes place somewhere before the end of the function or at the end of a function.
                 #         // some tricks form "unreachable code" may be required
                 addSymbol(type="function", symbol=token[1], flag=1)
-                print(symbolTable)
-                exit()
+                # print(symbolTable)
+
                 
                 functionDepth = 0
                 while not functionDepth: # loop to the start of the function
                     token = lexer.peekNextToken()
-                    print(token)
+                    # print(token)
                     if token[1] == "{": 
                         functionDepth = 1
 
@@ -183,7 +188,7 @@ def main(token):
                 while functionDepth: # ensures a return occurs before the end of a function
                     token = lexer.peekNextToken()
                     # print(token)
-                    print(functionDepth)
+                    # print(functionDepth)
                     if token[1] == "{": 
                         functionDepth += 1
 
@@ -194,9 +199,11 @@ def main(token):
                         returnFound = 1
 
                 if not returnFound:
-                    Error(token, "return found")
-                # function = 1
-                exit()
+                    Error(token, "return not found")
+                
+
+
+
 
             elif idExists(token):
                 # Check scope of variable
@@ -269,15 +276,14 @@ def main(token):
             
         while token[1]!=";":                        # Loop to the end of the return statement
             token = lexer.peekNextToken()
-            print(token)
+            # print(token)
 
         # Ensure the next token is the end of a function or condition
         if lexer.peekNextToken()[1] != "}":
             Error(token, "unreachable code")
 
 
-    if token[1]=="new":
-        exit()
+
 
     
 
