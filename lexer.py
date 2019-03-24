@@ -8,7 +8,7 @@ source file contains any kind of lexical errors.
 The lexer has been tested using the provided JACK source files and is shown to function 
 properly without any issues. 
 '''
-import semanticAnalyser
+
 
 
 # # file = list(shlex.shlex(open("source.jack", "r").read())) # Loads the test file
@@ -56,7 +56,7 @@ def getNextToken():
         peekFlag = 0
 
     token = consumeToken()
-    semanticAnalyser.main(token) # Peform semantic analysis while consuming tokens
+    # semanticAnalyser.main(token) # Peform semantic analysis while consuming tokens
     print(token)
     return token
 
@@ -154,7 +154,7 @@ peekFlag = 0
 def peekNextToken():
     '''When this function is called it will return the next available token in the input stream, but the token is not consumed (i.e. it will stay in the input). So, the next time the parser calls GetNextToken, or PeekNextToken, it gets this same token.'''
     global pos, peekFlag
-    
+
     if not peekFlag:
         peekFlag = 1
 

@@ -19,6 +19,21 @@ stdlib = [ "Math",          "init","abs","multiply","divide","min","max","sqrt",
 
 varType = ["int","str"]
 
+
+
+
+def banProg():
+
+    token = lexer.peekNextToken ()
+    while (token[0] != "EOF"):
+        stmt()
+        token = lexer.peekNextToken()
+
+
+
+
+
+
 def addSymbol(*args,**kwargs):
     symbolTable[0].append(kwargs.get("type",0))
     symbolTable[1].append(kwargs.get("symbol",0))
@@ -213,3 +228,5 @@ The following will take a list of tokens and input them into the semantic analys
 
 # for item in tokens:
 #     main(item)
+
+banProg()
