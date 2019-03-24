@@ -59,6 +59,12 @@ def addSymbol(*args,**kwargs):
     symbolTable[2].append(kwargs.get("flag",0))
     symbolTable[3].append(kwargs.get("scope",0))
 
+    if kwargs.get("type",0) in ["function","class"]: # if function or class add to function stack
+        global semicolon
+        functionStack[0].append(kwargs.get("symbol",0))
+        functionStack[1].append(0)
+
+
 def idExists(token):
     if token[1] in symbolTable[1]:
         return 1
@@ -81,7 +87,8 @@ semicolon = 0    #
 conditionalFlag = 0
 
 stack = []
-functionStack = []
+#               function , level
+functionStack = [[],[]]
 
 def main(token):
     global classFlag, function, parentheses, semicolon
@@ -89,18 +96,30 @@ def main(token):
     # print(token)
 
 
-    if token[0] == "{": 
+    if token[1] == "{":
         semicolon += 1
 
-    elif token[0] == "}": 
+        if len(functionStack[0]) and not functionStack[1][-1]:     # if function stack is not empty, and item depth on stack has not been set
+            functionStack[1][-1] = semicolon                       # Add function level onto the function stack
+            print("Setting depth of ",functionStack[0][-1],"to",functionStack[1][-1])
+
+    elif token[1] == "}": 
+        print("Current depth: ",semicolon,functionStack)
+        if len(functionStack[0]) and semicolon == functionStack[1][-1]: # If exiting from current function depth.
+            functionStack[0].pop()
+            functionStack[1].pop()
+
+        
         semicolon -= 1
         if semicolon==-1:
             Error(token, "mismatched number of semicolons")
 
 
-    elif token[0] == "(": 
+
+
+    elif token[1] == "(": 
         parentheses += 1
-    elif token[0] == ")": 
+    elif token[1] == ")": 
         parentheses -= 1
         if semicolon==-1:
             Error(token, "mismatched number of parentheses")
@@ -166,7 +185,7 @@ def main(token):
 
                 functionReturnType = stack[-2][1]
 
-            
+                
                 addSymbol(type="function", symbol=token[1], flag=1)
                 # print(symbolTable)
 
@@ -251,16 +270,16 @@ def main(token):
 
 
             else:
-                # print(token)
+
                 alternate = 0
                 for i in range( len(stack)): # loop till type is discerned
                     item = stack[-(i+1)]
-                    # print(item)
+
 
                     # var, comma, var, comma, var, 
                     if (item[1] in varType):
                         # if not alternate:
-                            addSymbol(type=item[1], symbol=token[1], flag=1)
+                            addSymbol(type=item[1], symbol=token[1], flag=1, scope=functionStack[1][-1])
                             break
                         # else:
                         #     Error(token,"invalid alt 1")
@@ -289,8 +308,6 @@ def main(token):
 
 
     
-
-    
     elif token[0] == "keyword":
 
         if token[1] == "let":
@@ -310,19 +327,12 @@ def main(token):
 
 
     
-
-
-
-
     # Other
     #     - Unreachable Code (eg. following a non-conditional return in the body of the function)
     elif token[1] == "return":
 
-
-            
         while token[1]!=";":                        # Loop to the end of the return statement
             token = lexer.peekNextToken()
-            # print(token)
 
         # Ensure the next token is the end of a function or condition
         if lexer.peekNextToken()[1] != "}":
