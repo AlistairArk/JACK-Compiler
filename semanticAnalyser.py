@@ -181,8 +181,8 @@ def main(token):
                         functionDepth = 1
 
                 returnFound = 0
+                token = lexer.peekNextToken()
                 while functionDepth: # ensures a return occurs before the end of a function
-                    token = lexer.peekNextToken()
                     # print(token)
                     # print(functionDepth)
                     if token[1] == "{": 
@@ -194,35 +194,38 @@ def main(token):
                     if functionDepth==1 and token[1]=="return": # If return statement on the function level
                         returnFound = 1
                         
+
+                    if token[1]=="return":
                         #     - The function returns a value compatible with the type of the function
                         #         // check current function type before returning values
                         token = lexer.peekNextToken()
                         print("\nfunctionReturnType",functionReturnType)
-                        if token[1]==";" or token[0]=="keyword":
+
+                        if functionReturnType =="void":
+                            if token[1]!=";":
+                                Error(token,"function is void but value was returned")
+
+                        elif token[1]==";" or token[0]=="keyword":
                             pass
-                            print("pass")
-                        else:
-                            # if it is another function - pass
-       
-                    #             type, symbol, declared flag, scope
+
+                        else:     
                             if token[1] in symbolTable[1]:
-                                print(symbolTable[0][symbolTable[1].index(token[1])])
-                                if symbolTable[0][symbolTable[1].index(token[1])] == "class":
-                                    print("is class")  
-                                elif symbolTable[0][symbolTable[1].index(token[1])] == "function": # if items index in symbol table is a function
-                                    print("is function")
+
+                                if symbolTable[0][symbolTable[1].index(token[1])] == "class":       # if return type is class
+                                    pass
+                                elif symbolTable[0][symbolTable[1].index(token[1])] == "function":  # if items index in symbol table is a function
+                                    pass
                                 elif symbolTable[0][symbolTable[1].index(token[1])] == functionReturnType:
-                                    print("types match")
+                                    pass
                                 else:
                                     print(symbolTable)
                                     Error(stack[-1],"function type and return don't match")
 
                             else:                            
                                 print("not found",token)
+                    else:
+                        token = lexer.peekNextToken()
 
-                        # if token is not of correct type
-                        # Error(token, "function returns incorrect type")
-                        #
 
 
 
