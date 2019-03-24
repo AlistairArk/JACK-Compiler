@@ -24,9 +24,11 @@ varType = ["int","str"]
 
 def banProg():
 
-    token = lexer.peekNextToken ()
+    token = lexer.peekNextToken()
     while (token[0] != "EOF"):
-        stmt()
+
+        token = lexer.getNextToken()
+        main(token)
         token = lexer.peekNextToken()
 
 

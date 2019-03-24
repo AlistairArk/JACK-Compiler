@@ -50,7 +50,7 @@ tokens = [
 
 
 def getNextToken():
-    global pos, peekFlag
+    global pos, peekFlag, posTemp
     if peekFlag:
         pos = posTemp               # Revert Pointer state 
         peekFlag = 0
@@ -151,14 +151,15 @@ def consumeToken():
     
 
 peekFlag = 0
+posTemp = 0
 def peekNextToken():
     '''When this function is called it will return the next available token in the input stream, but the token is not consumed (i.e. it will stay in the input). So, the next time the parser calls GetNextToken, or PeekNextToken, it gets this same token.'''
-    global pos, peekFlag
+    global pos, peekFlag, posTemp
 
     if not peekFlag:
         peekFlag = 1
+        posTemp = pos               # Save Current State of Pointer   
 
-    posTemp = pos               # Save Current State of Pointer   
     nextToken = consumeToken()  # Get Next Token
     return nextToken            # Return Token
 
