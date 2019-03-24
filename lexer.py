@@ -50,6 +50,11 @@ tokens = [
 
 
 def getNextToken():
+    global pos, peekFlag
+    if peekFlag:
+        pos = posTemp               # Revert Pointer state 
+        peekFlag = 0
+
     token = consumeToken()
     semanticAnalyser.main(token) # Peform semantic analysis while consuming tokens
     print(token)
@@ -145,13 +150,16 @@ def consumeToken():
         
     
 
+peekFlag = 0
 def peekNextToken():
     '''When this function is called it will return the next available token in the input stream, but the token is not consumed (i.e. it will stay in the input). So, the next time the parser calls GetNextToken, or PeekNextToken, it gets this same token.'''
-    global pos
+    global pos, peekFlag
+    
+    if not peekFlag:
+        peekFlag = 1
 
     posTemp = pos               # Save Current State of Pointer   
     nextToken = consumeToken()  # Get Next Token
-    pos = posTemp               # Revert Pointer state
     return nextToken            # Return Token
 
 
