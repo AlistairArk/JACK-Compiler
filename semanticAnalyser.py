@@ -17,6 +17,8 @@ stdlib = [ "Math",          "init","abs","multiply","divide","min","max","sqrt",
            "Sys",           "halt","error","wait"]
 
 
+varType = ["int","str"]
+
 def addSymbol(*args,**kwargs):
     symbolTable[0].append(kwargs.get("type",0))
     symbolTable[1].append(kwargs.get("symbol",0))
@@ -33,7 +35,7 @@ def idExists(token):
 
 def Error(*args):
     print("Error in line " + str(args[0][2]) + " at or near " + str(args[0][1])+ ", " + str(args[1]));
-
+    exit()
 
 
 classFlag = 0    # Detects when the program is in a class
@@ -69,7 +71,13 @@ def main(token):
 
 
     elif token[0] == "id":
-        if token[1] in stdlib:
+
+        '''
+        First perform a check to ignore the following:
+            - library functions
+            
+        '''
+        if token[1] in stdlib or (stack[-2][1]=="method" or stack[-2][1]=="constructor"):
             pass
         else:
             if stack[-2][1] == "class":
@@ -77,23 +85,61 @@ def main(token):
                     Error(token, "cannot nest class inside a class")
                 else:
                     classFlag = 1
+                    varType.append(token[1])
                     addSymbol(type="class", symbol=token[1], flag=1)
 
-            elif stack[-2][1] == "method"or stack[-2][1] == "constructor": # Store a list of functions each time one is declared
+            elif stack[-2][1] == "do": # ???
+                addSymbol(type="do", symbol=token[1], flag=1)
+
+            elif stack[-3][1] == "method" or stack[-3][1] == "constructor": # Store a list of functions each time one is declared
                 function = 1
                 addSymbol(type="function", symbol=token[1], flag=1)
 
             # if this is a declaration
             # if stack[-3][1]=="var" and (stack[-2][1]=="int" or stack[-2][1]=="str") :
-            elif (stack[-2][1]=="int" or stack[-2][1]=="str") :
-                addSymbol(type="var", symbol=token[1], flag=1)
 
-            elif idExists(token):    # if token was declared
+            elif idExists(token):
+                # Check scope of variable
                 pass
 
             else:
-                print(symbolTable)
-                Error(token, "undeclared id")
+                alternate = 0
+                for i in range( len(stack)): # loop till type is discerned
+                    item = stack[-(i+1)]
+                    print(item)
+
+                    # var, comma, var, comma, var, 
+                    if (item[1] in varType):
+                        # if not alternate:
+                            addSymbol(type="var", symbol=token[1], flag=1)
+                            break
+                        # else:
+                        #     Error(token,"invalid alt 1")
+                        
+                    elif item[1]==",":
+                        pass
+                        # if alternate:
+                        #     alternate = 0
+                        # else:
+                        #     Error(token,"invalid alt 2")
+
+                    elif token[0] == "id":
+                        pass
+                        # if not alternate:
+                        #     alternate = 1
+                        # else:
+                        #     Error(token,"invalid alt 3")
+                    else:
+                        Error(token, "use of undeclared variable")
+
+                print("\n\n meme",symbolTable)
+                return
+            # elif idExists(token):    # if token was declared
+            #     pass
+
+            # else:
+            #     print(symbolTable)
+            #     Error(token, "undeclared id")
 
 
     '''
