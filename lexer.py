@@ -57,7 +57,7 @@ def getNextToken():
 
     token = consumeToken()
     # semanticAnalyser.main(token) # Peform semantic analysis while consuming tokens
-    print(token)
+    # print(token)
     return token
 
 

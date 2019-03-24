@@ -64,6 +64,7 @@ semicolon = 0    #
 conditionalFlag = 0
 
 stack = []
+functionStack[]
 
 def main(token):
     global classFlag, function, parentheses, semicolon
@@ -94,22 +95,22 @@ def main(token):
 
     elif token[0] == "id":
 
-        '''
-        Correct usage of variables
-            - A variable has been declared before being used
-                // As a variable is declared add it to a list of known variables
+        
+        # Correct usage of variables
+        #     - A variable has been declared before being used
+        #         // As a variable is declared add it to a list of known variables
 
-            - A variable has been initialized before being used in an expression
-                // each time a variable is initialized, raise flag to indicated it has been initialized
+        #     - A variable has been initialized before being used in an expression
+        #         // each time a variable is initialized, raise flag to indicated it has been initialized
 
-            - Scope resolution (as in nested scopes or local variables)
+        #     - Scope resolution (as in nested scopes or local variables)
 
 
 
-        First perform a check to ignore the following:
-            - library functions
+        # First perform a check to ignore the following:
+        #     - library functions
             
-        '''
+        
         if token[1] in stdlib or (stack[-2][1]=="method" or stack[-2][1]=="constructor"):
             pass
         else:
@@ -124,8 +125,25 @@ def main(token):
             elif stack[-2][1] == "do": # ???
                 addSymbol(type="do", symbol=token[1], flag=1)
 
+
+
+
+            # Function Calling
+            #     - A function cannot be called if it has not been declared
+            #         // Store a list of functions each time one is declared
+            #         // (check list of do's in symbol table and compare them to the function list)
+
+            #     - The called function has the same number and type of parameters as its declaration
+            #         // store parameters paired with the functions declaration
+
+            #     - The function returns a value compatible with the type of the function
+            #         // check current function type before returning values
+          
+          
+
             elif stack[-3][1] == "method" or stack[-3][1] == "constructor": # Store a list of functions each time one is declared
                 function = 1
+                
                 addSymbol(type="function", symbol=token[1], flag=1)
 
 
@@ -173,42 +191,44 @@ def main(token):
 
 
 
-    '''
-    Type checking
-        - The RHS of an assignment statement is type compatible with the LHS
+    
 
-        - Coercion, ie. converting one type to another, for example in assignment parameter passing
+    # Type checking
+    #     - The RHS of an assignment statement is type compatible with the LHS
+
+    #     - Coercion, ie. converting one type to another, for example in assignment parameter passing
         
-        - Expressions used in array indices's have an integer value
-    '''
+    #     - Expressions used in array indices's have an integer value
+    
 
 
 
-    '''
-    Function Calling
-        - A function cannot be called if it has not been declared
-            // Store a list of functions each time one is declared
-            // (check list of do's in symbol table and compare them to the function list)
-
-        - The called function has the same number and type of parameters as its declaration
-            // store parameters paired with the functions declaration
-
-        - The function returns a value compatible with the type of the function
-            // check current function type before returning values
-  
-        - All paths return a value
-            // Detect function closing, ensure a return takes place somewhere before the end of the function or at the end o a function.
-            // some tricks form "unreachable code" may be required
-    '''
-    # elif token[0] == "return":
-    #     pass
+    
 
 
-    '''
-    Other
-        - Unreachable Code (eg. following a non-conditional return in the body of the function)
 
-    '''
+
+    # Other
+    #     - Unreachable Code (eg. following a non-conditional return in the body of the function)
+    elif token[1] == "return":
+
+
+        #     - All paths return a value
+        #         // Detect function closing, ensure a return takes place somewhere before the end of the function or at the end of a function.
+        #         // some tricks form "unreachable code" may be required
+            
+        while token[1]!=";":                        # Loop to the end of the return statement
+            token = lexer.peekNextToken()
+            print(token)
+
+        # Ensure the next token is the end of a function or condition
+        if lexer.peekNextToken()[1] != "}":
+            Error(token, "unreachable code")
+
+
+    
+
+    
 
 
 
