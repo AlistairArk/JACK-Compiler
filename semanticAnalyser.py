@@ -7,14 +7,25 @@ symbolTable = [[],    [],        [],        []]
 
 
 # JACK - Standard Library (Built in functions)
-stdlib = [ "Math",          "init","abs","multiply","divide","min","max","sqrt",
-           "String",        "dispose","length","charAt","setCharAt","appendChar","eraseLastChar","intValue","setInt","backSpace","doubleQuote","newLine",
-           "Array",         "new","dispose",
-           "Output",        "moveCursor","printChar","printString","printInt","println","backSpace",
-           "Screen",        "clearScreen","setColor","drawPixel","drawLine","drawRectangle","drawCircle",
-           "Memory",        "peek","poke","alloc","deAlloc",
-           "Keyboard",      "keyPressed","readChar","readLine","readInt",
-           "Sys",           "halt","error","wait"]
+stdlib = [  ["Math"],
+            ["String"],
+            ["Array"],
+            ["Output"],
+            ["Screen"],
+            ["Memory"],
+            ["Keyboard"],
+            ["Sys"],
+
+            [["init","abs","multiply","divide","min","max","sqrt"],
+            ["dispose","length","charAt","setCharAt","appendChar","eraseLastChar","intValue","setInt","backSpace","doubleQuote","newLine"],
+            ["new","dispose"],
+            ["moveCursor","printChar","printString","printInt","println","backSpace"],
+            ["clearScreen","setColor","drawPixel","drawLine","drawRectangle","drawCircle"],
+            ["peek","poke","alloc","deAlloc"],
+            ["keyPressed","readChar","readLine","readInt"],
+            ["halt","error","wait"]]
+         ]
+
 
 
 varType = ["int","str"]
@@ -64,13 +75,12 @@ semicolon = 0    #
 conditionalFlag = 0
 
 stack = []
-functionStack[]
+functionStack = []
 
 def main(token):
     global classFlag, function, parentheses, semicolon
     stack.append(token)
-
-
+    print(token)
 
 
     if token[0] == "{": 
@@ -107,13 +117,25 @@ def main(token):
 
 
 
-        # First perform a check to ignore the following:
-        #     - library functions
             
         
-        if token[1] in stdlib or (stack[-2][1]=="method" or stack[-2][1]=="constructor"):
-            pass
-        else:
+        # First perform a check to ignore the following:
+        #     - library functions
+        libFunction = 0
+        if token[1] in stdlib[0]:
+            stdlibIndex = token[1].index(stdlib[0]) # Get index of token
+            token = lexer.peekNextToken()
+
+            if token[1] == ".":
+                token = lexer.peekNextToken()
+                if token[1] in stdlib[1][stdlibIndex]:
+                    libFunction = 1
+
+        elif (stack[-2][1]=="method" or stack[-2][1]=="constructor"):
+            libFunction = 1
+
+
+        if not libFunction:
             if stack[-2][1] == "class":
                 if classFlag:
                     Error(token, "cannot nest class inside a class")
@@ -128,24 +150,53 @@ def main(token):
 
 
 
-            # Function Calling
-            #     - A function cannot be called if it has not been declared
-            #         // Store a list of functions each time one is declared
-            #         // (check list of do's in symbol table and compare them to the function list)
-
-            #     - The called function has the same number and type of parameters as its declaration
-            #         // store parameters paired with the functions declaration
-
-            #     - The function returns a value compatible with the type of the function
-            #         // check current function type before returning values
-          
           
 
             elif stack[-3][1] == "method" or stack[-3][1] == "constructor": # Store a list of functions each time one is declared
-                function = 1
-                
-                addSymbol(type="function", symbol=token[1], flag=1)
 
+                # Function Calling
+                #     - A function cannot be called if it has not been declared
+                #         // Store a list of functions each time one is declared
+                #         // (check list of do's in symbol table and compare them to the function list)
+
+                #     - The called function has the same number and type of parameters as its declaration
+                #         // store parameters paired with the functions declaration
+
+                #     - The function returns a value compatible with the type of the function
+                #         // check current function type before returning values
+            
+                #     - All paths return a value
+                #         // Detect function closing, ensure a return takes place somewhere before the end of the function or at the end of a function.
+                #         // some tricks form "unreachable code" may be required
+                addSymbol(type="function", symbol=token[1], flag=1)
+                print(symbolTable)
+                exit()
+                
+                functionDepth = 0
+                while not functionDepth: # loop to the start of the function
+                    token = lexer.peekNextToken()
+                    print(token)
+                    if token[1] == "{": 
+                        functionDepth = 1
+
+                returnFound = 0
+                while functionDepth: # ensures a return occurs before the end of a function
+                    token = lexer.peekNextToken()
+                    # print(token)
+                    print(functionDepth)
+                    if token[1] == "{": 
+                        functionDepth += 1
+
+                    elif token[1] == "}": 
+                        functionDepth -= 1
+
+                    if functionDepth==1 and token[1]=="return": # If return statement on the function level
+                        returnFound = 1
+
+                if not returnFound:
+                    Error(token, "return found")
+                # function = 1
+                exit()
 
             elif idExists(token):
                 # Check scope of variable
@@ -156,11 +207,11 @@ def main(token):
 
 
             else:
-                print(token)
+                # print(token)
                 alternate = 0
                 for i in range( len(stack)): # loop till type is discerned
                     item = stack[-(i+1)]
-                    print(item)
+                    # print(item)
 
                     # var, comma, var, comma, var, 
                     if (item[1] in varType):
@@ -171,14 +222,16 @@ def main(token):
                         #     Error(token,"invalid alt 1")
                         
                     elif item[1]==",":
-                        print("comma")
+                        pass
+                        # print("comma")
                         # if alternate:
                         #     alternate = 0
                         # else:
                         #     Error(token,"invalid alt 2")
 
                     elif item[0] == "id" or item[1]==".":
-                        print("id")
+                        pass
+                        # print("id")
                         # if not alternate:
                         #     alternate = 1
                         # else:
@@ -186,7 +239,7 @@ def main(token):
                     else:
                         Error(token, "use of undeclared variable")
 
-                print("\n")
+                # print("\n")
                 return
 
 
@@ -213,9 +266,6 @@ def main(token):
     elif token[1] == "return":
 
 
-        #     - All paths return a value
-        #         // Detect function closing, ensure a return takes place somewhere before the end of the function or at the end of a function.
-        #         // some tricks form "unreachable code" may be required
             
         while token[1]!=";":                        # Loop to the end of the return statement
             token = lexer.peekNextToken()
@@ -226,7 +276,8 @@ def main(token):
             Error(token, "unreachable code")
 
 
-    
+    if token[1]=="new":
+        exit()
 
     
 
