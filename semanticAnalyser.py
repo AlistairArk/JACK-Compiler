@@ -70,9 +70,23 @@ def main(token):
             Error(token, "mismatched number of parentheses")
 
 
+
+
+
     elif token[0] == "id":
 
         '''
+        Correct usage of variables
+            - A variable has been declared before being used
+                // As a variable is declared add it to a list of known variables
+
+            - A variable has been initialized before being used in an expression
+                // each time a variable is initialized, raise flag to indicated it has been initialized
+
+            - Scope resolution (as in nested scopes or local variables)
+
+
+
         First perform a check to ignore the following:
             - library functions
             
@@ -103,6 +117,7 @@ def main(token):
                 pass
 
             else:
+                print(token)
                 alternate = 0
                 for i in range( len(stack)): # loop till type is discerned
                     item = stack[-(i+1)]
@@ -117,14 +132,14 @@ def main(token):
                         #     Error(token,"invalid alt 1")
                         
                     elif item[1]==",":
-                        pass
+                        print("comma")
                         # if alternate:
                         #     alternate = 0
                         # else:
                         #     Error(token,"invalid alt 2")
 
-                    elif token[0] == "id":
-                        pass
+                    elif item[0] == "id" or item[1]==".":
+                        print("id")
                         # if not alternate:
                         #     alternate = 1
                         # else:
@@ -132,7 +147,7 @@ def main(token):
                     else:
                         Error(token, "use of undeclared variable")
 
-                print("\n\n meme",symbolTable)
+                print("\n")
                 return
             # elif idExists(token):    # if token was declared
             #     pass
@@ -141,46 +156,49 @@ def main(token):
             #     print(symbolTable)
             #     Error(token, "undeclared id")
 
-
     '''
-    Correct usage of variables
-    - A variable has been declared before being used
-        // As a variable is declared add it to a list of known variables
-
-    - A variable has been initialized before being used in an expression
-        // each time a variable is initialized, raise flag to indicated it has been initialized
-
-    - Scope resolution (as in nested scopes or local variables)
-
-
     Type checking
-    - The RHS of an assignment statement is type compatible with the LHS
+        - The RHS of an assignment statement is type compatible with the LHS
 
-    - Coercion, ie. converting one type to another, for example in assignment parameter passing
-    
-    - Expressions used in array indices's have an integer value
-
-
-    Function Calling
-    - A function cannot be called if it has not been declared
-        // Store a list of functions each time one is declared
-
-    - The called function has the same number and type of parameters as its declaration
-        // store parameters paired with the functions declaration
-
-    - The function returns a value compatible with the type of the function
-        // check current function type before returning values
+        - Coercion, ie. converting one type to another, for example in assignment parameter passing
+        
+        - Expressions used in array indices's have an integer value
+    '''
 
 
-    Function Calling
-    - All paths return a value
-        // Detect function closing, ensure a return takes place somewhere before the end of the function or at the end o a function.
-        // some tricks form "unreachable code" may be required
-
-    Other
-    - Unreachable Code (eg. following a non-conditional return in the body of the function)
 
     '''
+    Function Calling
+        - A function cannot be called if it has not been declared
+            // Store a list of functions each time one is declared
+            // (check list of do's in symbol table and compare them to the function list)
+
+        - The called function has the same number and type of parameters as its declaration
+            // store parameters paired with the functions declaration
+
+        - The function returns a value compatible with the type of the function
+            // check current function type before returning values
+  
+        - All paths return a value
+            // Detect function closing, ensure a return takes place somewhere before the end of the function or at the end o a function.
+            // some tricks form "unreachable code" may be required
+    '''
+
+
+
+    '''
+    Other
+        - Unreachable Code (eg. following a non-conditional return in the body of the function)
+
+    '''
+
+
+
+
+
+
+
+
 
 
 '''
