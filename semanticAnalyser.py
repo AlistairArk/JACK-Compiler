@@ -66,6 +66,8 @@ def addSymbol(*args,**kwargs):
 
 
 def idExists(token):
+    #     - A variable has been declared before being used
+    #         // As a variable is declared add it to a list of known variables
     if token[1] in symbolTable[1]:
         return 1
     else:
@@ -88,12 +90,11 @@ conditionalFlag = 0
 
 stack = []
 #               function , level
-functionStack = [[],[]]
+functionStack = [[0],[0]]
 
 def main(token):
     global classFlag, function, parentheses, semicolon
     stack.append(token)
-    # print(token)
 
 
     if token[1] == "{":
@@ -101,10 +102,10 @@ def main(token):
 
         if len(functionStack[0]) and not functionStack[1][-1]:     # if function stack is not empty, and item depth on stack has not been set
             functionStack[1][-1] = semicolon                       # Add function level onto the function stack
-            print("Setting depth of ",functionStack[0][-1],"to",functionStack[1][-1])
+
 
     elif token[1] == "}": 
-        print("Current depth: ",semicolon,functionStack)
+
         if len(functionStack[0]) and semicolon == functionStack[1][-1]: # If exiting from current function depth.
             functionStack[0].pop()
             functionStack[1].pop()
@@ -130,19 +131,9 @@ def main(token):
 
     elif token[0] == "id":
 
-        
-        # Correct usage of variables
-        #     - A variable has been declared before being used
-        #         // As a variable is declared add it to a list of known variables
-
-        #     - A variable has been initialized before being used in an expression
-        #         // each time a variable is initialized, raise flag to indicated it has been initialized
-
-        #     - Scope resolution (as in nested scopes or local variables)
 
 
-
-            
+ 
         
         libFunction = 0
         if token[1] in stdlib[0]:
@@ -161,6 +152,8 @@ def main(token):
 
 
 
+
+
         elif (stack[-2][1]=="method" or stack[-2][1]=="constructor"):
             # Perform a check to ignore method & constructor keywords
             libFunction = 1
@@ -172,10 +165,10 @@ def main(token):
                 else:
                     classFlag = 1
                     varType.append(token[1])
-                    addSymbol(type="class", symbol=token[1], flag=1)
+                    addSymbol(type="class", symbol=token[1], flag=1, scope=functionStack[0][-1])
 
             elif stack[-2][1] == "do": # ???
-                addSymbol(type="do", symbol=token[1], flag=1)
+                addSymbol(type="do", symbol=token[1], flag=1, scope=functionStack[0][-1])
 
 
           
@@ -184,10 +177,9 @@ def main(token):
                 # Function Calling
 
                 functionReturnType = stack[-2][1]
+                addSymbol(type="function", symbol=token[1], flag=1, scope=functionStack[0][-1])
 
-                
-                addSymbol(type="function", symbol=token[1], flag=1)
-                # print(symbolTable)
+
 
                 #     - The called function has the same number and type of parameters as its declaration
                 #         // store parameters paired with the functions declaration
@@ -195,15 +187,15 @@ def main(token):
                 functionDepth = 0
                 while not functionDepth: # loop to the start of the function
                     token = lexer.peekNextToken()
-                    # print(token)
+
                     if token[1] == "{": 
                         functionDepth = 1
 
                 returnFound = 0
                 token = lexer.peekNextToken()
                 while functionDepth: # ensures a return occurs before the end of a function
-                    # print(token)
-                    # print(functionDepth)
+
+
                     if token[1] == "{": 
                         functionDepth += 1
 
@@ -218,7 +210,7 @@ def main(token):
                         #     - The function returns a value compatible with the type of the function
                         #         // check current function type before returning values
                         token = lexer.peekNextToken()
-                        print("\nfunctionReturnType",functionReturnType)
+
 
                         if functionReturnType =="void":
                             if token[1]!=";":
@@ -261,15 +253,14 @@ def main(token):
 
 
 
-            elif idExists(token):
-                # Check scope of variable
-
-                # If variable is being used outside scope log error
-                pass
-
-
-
             else:
+        
+                # Correct usage of variables
+
+
+                #     - A variable has been initialized before being used in an expression
+                #         // each time a variable is initialized, raise flag to indicated it has been initialized
+
 
                 alternate = 0
                 for i in range( len(stack)): # loop till type is discerned
@@ -279,7 +270,7 @@ def main(token):
                     # var, comma, var, comma, var, 
                     if (item[1] in varType):
                         # if not alternate:
-                            addSymbol(type=item[1], symbol=token[1], flag=1, scope=functionStack[1][-1])
+                            addSymbol(type=item[1], symbol=token[1], flag=1, scope=functionStack[0][-1])
                             break
                         # else:
                         #     Error(token,"invalid alt 1")
@@ -299,10 +290,25 @@ def main(token):
                         #     alternate = 1
                         # else:
                         #     Error(token,"invalid alt 3")
+                        
                     else:
-                        Error(token, "use of undeclared variable")
 
-                # print("\n")
+                        # Check if variable already exists
+                        if idExists(token):
+                            #     - Scope resolution (as in nested scopes or local variables)
+                            # Check scope of variable
+
+                            varScope = symbolTable[3][symbolTable[1].index(token[1])] # get variable scope in symbol table 
+                            if varScope in functionStack[0]:
+                                return # Variable in scope
+                            else:
+                                print(symbolTable)
+                                print(token)
+                                Error(token,"variable used outside scope")                # If variable is being used outside scope log error
+
+                        else:
+                            Error(token, "use of undeclared variable")
+
                 return
 
 
@@ -342,7 +348,6 @@ def main(token):
 
 
     
-
 
 
 
