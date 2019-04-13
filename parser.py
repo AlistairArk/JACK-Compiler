@@ -36,20 +36,22 @@ def Init(file_name):
 
 
 def OK(token):
+    pass
     # print(token[1] + ": OK " )
         
-    token = lexer.peekNextToken()
-    while (token[0] != "EOF"):
-        stmt()
-        token = lexer.peekNextToken()
+    # token = lexer.peekNextToken()
+    # while (token[0] != "EOF"):
+    #     stmt()
+    #     token = lexer.peekNextToken()
         
 
 
-def banProg():
+def parseFile():
 
     token = lexer.peekNextToken ()
     while (token[0] != "EOF"):
         stmt()
+        print(token)
         token = lexer.peekNextToken()
 
 
@@ -154,4 +156,4 @@ keywords = {"class":parserKeywords.Class ,
             }
 
 
-banProg()
+# parseFile()

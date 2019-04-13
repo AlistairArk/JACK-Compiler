@@ -33,7 +33,7 @@ varType = ["int","str"]
 
 
 
-def banProg():
+def analyseSemantic():
 
     token = lexer.peekNextToken()
     while (token[0] != "EOF"):
@@ -96,7 +96,7 @@ def main(token):
     global classFlag, function, parentheses, semicolon
     stack.append(token)
 
-
+    print("     ",token)
     if token[1] == "{":
         semicolon += 1
 
@@ -364,4 +364,4 @@ The following will take a list of tokens and input them into the semantic analys
 
 '''
 
-banProg()
+
