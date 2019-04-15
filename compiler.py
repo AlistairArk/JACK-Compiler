@@ -8,6 +8,8 @@ def loadFile(filename):
     lexer.fileLen = len(lexer.file)
     lexer.pos = -1
     lexer.lineNum = 0
+    lexer.peekFlag = 0
+    lexer.posTemp = 0
 
 def main(args):
     print(args)
@@ -19,6 +21,13 @@ def main(args):
     loadFile(args[0])
     semanticAnalyser.analyseSemantic()
 
-main(["source.jack"])
+    loadFile(args[0])
+    '''
+    compile code and generate file
+    '''
+
+main(["source.jack"]) # Compiler test
+
+# # Code to run the program from command line 
 # if __name__ == "__main__":
 #     main(sys.argv[1:])
