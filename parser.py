@@ -7,17 +7,17 @@ The program does not crash or become unstable if the source file contains any ki
 Both the lexer and parser have been tested using the provided JACK source files and are shown to function properly without any issues. 
 '''
 
-import lexer
-from parserData import keywords as parserKeywords
+import lexer, parserKeywords
 
 '''
 note:
     token[0] = type
     token[1] = lexeme
+    token[2] = line number
 '''
 
 
-
+ 
 
 def Error(*args):
     print("Error in line " + str(args[0][2]) + " at or near " + str(args[0][1])+ ", " + str(args[1]));
@@ -28,22 +28,13 @@ def Error(*args):
 def Init(file_name):
     pass
 
-    # if (!lexer.Init(file_name)):
-    #     print("Unable to init the lexer")
-    # else:
-    #     print("Parser Initialized ")
+
 
 
 
 def OK(token):
     pass
-    # print(token[1] + ": OK " )
-        
-    # token = lexer.peekNextToken()
-    # while (token[0] != "EOF"):
-    #     stmt()
-    #     token = lexer.peekNextToken()
-        
+
 
 
 def parseFile():
@@ -51,11 +42,10 @@ def parseFile():
     token = lexer.peekNextToken ()
     while (token[0] != "EOF"):
         stmt()
-        print(token)
         token = lexer.peekNextToken()
 
 
-
+    print(parserKeywords.output)
 
 
 
@@ -98,12 +88,9 @@ def stmt():
             Error(token, "unknown operator")
   
     elif token[0] in "id": 
-        # print(token)       
         OK(token) # be happy
-        # if token[1] in lexer.operators:        
-        #     OK(token) # be happy
-        # else:
-        #     Error(token, "unknown operator")
+
+
 
     elif token[0] in "number":        
         OK(token) # be happy
@@ -156,4 +143,4 @@ keywords = {"class":parserKeywords.Class ,
             }
 
 
-# parseFile()
+parseFile()

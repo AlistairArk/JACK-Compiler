@@ -96,7 +96,7 @@ def main(token):
     global classFlag, function, parentheses, semicolon
     stack.append(token)
 
-    print("     ",token)
+    # print("     ",token)
     if token[1] == "{":
         semicolon += 1
 
