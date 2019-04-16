@@ -51,6 +51,14 @@ def method(token):
     return [0, "'' expected"]
 
 def function(token):
+    print(token)
+    token = lexer.getNextToken()
+    print(token)
+    token = lexer.getNextToken()
+    print(token)
+
+
+    text("function "+token[1]+" 1")
     return [1]
 
     return [0, "'' expected"]
