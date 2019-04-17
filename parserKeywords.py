@@ -27,7 +27,7 @@ def addSymbol(*args,**kwargs):
 # Store list of identifiers as they are pushed to memorySegment
 memorySegment = []
 
-
+varList = []
 
 
 
@@ -50,18 +50,54 @@ def method(token):
 
     return [0, "'' expected"]
 
+
+
 def function(token):
     print(token)
     token = lexer.getNextToken()
     print(token)
     token = lexer.getNextToken()
     print(token)
+    token = lexer.getNextToken()
+    print(token)
+    if token[1]!="(":
+        return [0, "'(' expected"]
 
+    ## ADD CHECKS FOR FUNCTION
+    expectedTypeList = ["keyword","id","symbol"]
+    expectedTypePointer = 0
+    while token[1]!=")":
+        token = lexer.getNextToken()
+        
+        if token[0]!=expectedTypeList[expectedTypePointer]:
+            return [0, "'"+expectedTypeList[expectedTypePointer]+"' expected"]
+        
+        elif token[0] == "keyword":
+            if not token[1] in ["int", "boolean", "char"]: 
+                return [0, "unexpected keyword type"]
+        
+        elif token[0] == "id": # add variable to symbol table
+                addSymbol(type="var", symbol=token[1], scope="argument")
+
+        elif token[0] == "symbol":
+            if not token[1] in [",", ")"]: 
+                return [0, "unexpected symbol type"]
+
+        print("  ",token)
+        # incriment pointer
+        expectedTypePointer+=1
+        if expectedTypePointer == 3:
+            expectedTypePointer = 0
+
+        # tokenStack.append(token) 
+    token = lexer.getNextToken()
+    print(token)
+    if token[1]!="{":
+        return [0, "'{' expected"]
 
     text("function "+token[1]+" 1")
     return [1]
 
-    return [0, "'' expected"]
 
 def int(token):
     return [1]
@@ -95,6 +131,51 @@ that:         - used to access another object.
 pointer:      - used to access a two location segment containing the ‘this’ (pointer[0]) and the ‘that’ (pointer[1]) pointers.
 temp:         - used to access an 8 location segment for storing temporary values (a register file)
 const:        - used to push a constant value into the stack.
+
+
+
+
+
+ 
+
+
+
+
+
+function int mult (int x, int y) {
+    var int result;
+    let result = 0;
+    while ~(x = 0) {
+        let result = result + y;
+        let x = x - 1;
+    }
+    return result;
+}
+
+
+
+function mult 1           // function int mult
+    push constant 0       // var int result;
+    pop local 0           // 
+label loop                // while
+    push argument 0       // x
+    push constant 0       // 0
+    eq                    // =
+    if-goto end           // 
+    push argument 1       // 
+    push local 0          // 
+    add                   // 
+    pop local 0           // 
+    push argument 0       // 
+    push constant 1       // 
+    sub                   // 
+    pop argument 0        // 
+    goto loop             // 
+label end                 // }
+
+    push local 0          // return result
+    return                // 
+
 '''
 
 
@@ -108,7 +189,7 @@ def var(token):
         print(token)
         return [0, "identifier expected"]
     else:
-        memorySegment.append(token[1])
+        varList.append(token[1])
         text("push constant 0")
 
     # print("\n",token)
@@ -131,6 +212,11 @@ def field(token):
     return [0, "'' expected"]
 
 def let(token):
+    token = lexer.getNextToken()
+    print(token)
+    varIndex = str(varList.index(token[1]))
+    text("pop local "+varIndex)
+
     return [1]
 
     return [0, "'' expected"]
