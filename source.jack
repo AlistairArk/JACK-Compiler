@@ -17,3 +17,5 @@ var int i, sum;         // This line doens't generate any code as well.
 let length = 12;
 let i = 0;
 let sum = 0;
+
+return;

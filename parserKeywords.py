@@ -494,15 +494,22 @@ def Else(token):
     else:
         return [0, "'{' expected"]
 
+
+
 def While(token):
     return [1]
 
     return [0, "'' expected"]
 
+
+
 def Return(token):
+    text("return")
+    if lexer.getNextToken()[1]!=";":
+        return [0, "';' expected"]
+    
     return [1]
 
-    return [0, "'' expected"]
 
 def true(token):
     return [1]
