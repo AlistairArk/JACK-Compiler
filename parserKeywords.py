@@ -213,7 +213,18 @@ while (i < length){
 }
 
 
+push constant 12
+pop local 0
 
+push constant 0
+pop local 1
+
+push constant 0
+pop local 2
+
+push local 1
+push local 0
+it
 
 
 
@@ -232,18 +243,30 @@ def var(token):
         return [0, "'' expected"]
                 # addSymbol(type="argument", symbol=token[1], scope="")
 
-    token = lexer.getNextToken()
-    if token[0]=="number":
-        print(token)
-        return [0, "identifier expected"]
-    else:
-        addSymbol(type="local", symbol=token[1], scope="")
+    print("\n\n")
 
-
+    tokenSwitch = 1
     while token[1]!=";":
-        token = lexer.peekNextToken()
-        tokenStack.append(token) 
-        print(tokenStack[-1])
+        token = lexer.getNextToken()
+
+        if token[1]!=";":
+            if tokenSwitch:
+                if token[0]!="id":
+                    # print(token)
+                    return [0, "identifier expected"]
+                else:
+                    addSymbol(type="local", symbol=token[1], scope="")
+
+                tokenSwitch = 0
+            else:        
+                if token[0]!="symbol" and token[1]!="," :
+                    return [0, "symbol expected"]
+                else:
+                    tokenSwitch = 1
+
+        # token = lexer.peekNextToken()
+        # tokenStack.append(token) 
+        # print(tokenStack[-1])
 
     return [1]
 

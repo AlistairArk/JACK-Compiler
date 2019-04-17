@@ -1,4 +1,5 @@
-/**function int mult (int x, int y) {
+/**
+function int mult (int x, int y) {
     var int result;
     let result = 0;
     while ~(x = 0) {
@@ -7,9 +8,12 @@
     }
     return result;
 }
+
 */
 
-function int mult (int x, int y) {
-    var int result;
-    let result = -5+5*55;
-}
+var int length;         // simply add a local variable to the table of local variables for this fucntion
+var int i, sum;         // This line doens't generate any code as well.
+
+let length = 12;
+let i = 0;
+let sum = 0;
