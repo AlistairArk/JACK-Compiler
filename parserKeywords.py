@@ -9,13 +9,23 @@ def text(dialogue):
     output += dialogue + "\n"
 
 
-#             type, symbol, declared flag, scope
+#             type, symbol, index, scope
 symbolTable = [[],    [],        [],        []]
 
+symbolIndexList = [[],[]]
 def addSymbol(*args,**kwargs):
+
+    # Add new type to list of indexes as encountered
+    if not kwargs.get("type",0) in symbolIndexList[0]:
+        symbolIndexList[0].append(kwargs.get("type",0)) 
+        symbolIndexList[1].append(-1)
+
+    symbolIndex = symbolIndexList[0].index(kwargs.get("type",0))
+    symbolIndexList[1][symbolIndex] += 1 # Incriment index
+
     symbolTable[0].append(kwargs.get("type",0))
     symbolTable[1].append(kwargs.get("symbol",0))
-    symbolTable[2].append(kwargs.get("flag",0))
+    symbolTable[2].append(kwargs.get("index",symbolIndexList[1][symbolIndex]))
     symbolTable[3].append(kwargs.get("scope",0))
 
     if kwargs.get("type",0) in ["function","class"]: # if function or class add to function stack
@@ -52,18 +62,30 @@ def method(token):
 
 
 
-def function(token):
-    print(token)
+def function(token): # function int mult
+
+    # Check function is of proper type
+    token = lexer.getNextToken()
+    if not token[1] in ["int", "boolean", "char", "void"]:
+        return [0, "unexpected function type"]
+    if token[0] != "keyword":
+        return [0, "'keyword' expected"]
+
+
+    # Check function has appropriate type and name
     token = lexer.getNextToken()
     print(token)
+    if token[0] != "id":
+        return [0, "'id' expected"]
+
+    text("function "+token[1]+" 1")
+
+
     token = lexer.getNextToken()
-    print(token)
-    token = lexer.getNextToken()
-    print(token)
     if token[1]!="(":
         return [0, "'(' expected"]
 
-    ## ADD CHECKS FOR FUNCTION
+    ## Check syntax of function arguments
     expectedTypeList = ["keyword","id","symbol"]
     expectedTypePointer = 0
     while token[1]!=")":
@@ -77,25 +99,22 @@ def function(token):
                 return [0, "unexpected keyword type"]
         
         elif token[0] == "id": # add variable to symbol table
-                addSymbol(type="var", symbol=token[1], scope="argument")
+                addSymbol(type="argument", symbol=token[1], scope="")
 
         elif token[0] == "symbol":
             if not token[1] in [",", ")"]: 
                 return [0, "unexpected symbol type"]
 
-        print("  ",token)
         # incriment pointer
         expectedTypePointer+=1
         if expectedTypePointer == 3:
             expectedTypePointer = 0
 
-        # tokenStack.append(token) 
+
     token = lexer.getNextToken()
-    print(token)
     if token[1]!="{":
         return [0, "'{' expected"]
 
-    text("function "+token[1]+" 1")
     return [1]
 
 
@@ -136,9 +155,6 @@ const:        - used to push a constant value into the stack.
 
 
 
- 
-
-
 
 
 
@@ -176,27 +192,58 @@ label end                 // }
     push local 0          // return result
     return                // 
 
+
+
+
+
+
+
+
+// Declaring a var doesn't generate code
+// It simply adds some entries to the symbol table
+var int length;         // simply add a local variable to the table of local variables for this fucntion
+var int i, sum;         // This line doens't generate any code as well.
+
+let length = 12;
+let i = 0;
+let sum = 0;
+while (i < length){
+    let sum = sum + i;
+    let i = i + 1;
+}
+
+
+
+
+
+
+
 '''
+
+
+
+
+
 
 
 def var(token):
     token = lexer.getNextToken()
     if not token[1] in ["int", "boolean", "char", "void"]:
         return [0, "'' expected"]
+                # addSymbol(type="argument", symbol=token[1], scope="")
 
     token = lexer.getNextToken()
     if token[1].isdigit():
         print(token)
         return [0, "identifier expected"]
     else:
-        varList.append(token[1])
-        text("push constant 0")
+        addSymbol(type="local", symbol=token[1], scope="")
 
-    # print("\n",token)
-    # while token[1]!=";":
-    #     token = lexer.peekNextToken()
-    #     tokenStack.append(token) 
-    #     print(tokenStack[-1])
+
+    while token[1]!=";":
+        token = lexer.peekNextToken()
+        tokenStack.append(token) 
+        print(tokenStack[-1])
 
     return [1]
 
@@ -211,15 +258,64 @@ def field(token):
 
     return [0, "'' expected"]
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#             type, symbol, index, scope
+
 def let(token):
+    pass
+    print("\n",token)
     token = lexer.getNextToken()
     print(token)
-    varIndex = str(varList.index(token[1]))
-    text("pop local "+varIndex)
+
+    token = lexer.getNextToken()
+    print(token)
+
+    token = lexer.getNextToken()
+    print(token)
+    text("push constant "+str(token[1]))
+    text("pop local "+str(token[1]))
+
+    token = lexer.getNextToken()
+    print(token)
+    
+
+    # symbolIndex = symbolTable[1].index(token[1])
+    
+    # varType     = str(symbolTable[1].index(token[1]))
+    # print("   ",symbolTable)
+    # text("pop local "+varIndex)
 
     return [1]
 
     return [0, "'' expected"]
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 def do(token):
     return [1]
