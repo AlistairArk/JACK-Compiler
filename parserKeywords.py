@@ -233,7 +233,7 @@ def var(token):
                 # addSymbol(type="argument", symbol=token[1], scope="")
 
     token = lexer.getNextToken()
-    if token[1].isdigit():
+    if token[0]=="number":
         print(token)
         return [0, "identifier expected"]
     else:
@@ -277,21 +277,122 @@ def field(token):
 #             type, symbol, index, scope
 
 def let(token):
-    pass
-    print("\n",token)
-    token = lexer.getNextToken()
-    print(token)
+    calcList = [] # Stores list of tokens in calculation
+
+
+    def pushPop(token):
+        if token[0]=="number":
+            return ["constant", token[1]]
+        else:
+            # Get data for popping    
+            symbolIndex = symbolTable[1].index(token[1])
+            varIndex = symbolTable[2][symbolIndex]
+            varType  = symbolTable[0][symbolIndex]
+            return [varType, varIndex]
+
+    def operatorToCode(token):
+        # ["+","-","*","/","&","|","~","<",">"]
+        
+        if token[1] == "+":
+            text("add")
+        elif token[1] == "-":
+            text("sub")
+        elif token[1] == ">":
+            text("gt")
+        elif token[1] == "<":
+            text("lt")
+        elif token[1] == "And":
+            text("and")
+        elif token[1] == "Or":
+            text("or")
+
+        # (commands neg and not are handled interdependently)
 
     token = lexer.getNextToken()
-    print(token)
+
+    if token[0]!="id":
+        return [0, "'id' expected"]
+
+    popData = pushPop(token)
+
 
     token = lexer.getNextToken()
-    print(token)
-    text("push constant "+str(token[1]))
-    text("pop local "+str(token[1]))
+    if token[0]!="symbol":
+        return [0, "'id' expected"]
+    elif token[1]!="=":
+        return [0, "'=' expected"]
+
 
     token = lexer.getNextToken()
-    print(token)
+    if token[1]==";":
+        return [0, "expression expected"]
+
+
+
+
+    while token[1]!=";":
+        calcList.append(token)
+        token = lexer.getNextToken()
+
+    print(calcList)
+    if len(calcList) == 1:
+        text("push constant "+str(calcList[0][1]))
+    else: # Handle expression
+
+        '''
+        # First check expression has correct syntax
+        
+        expectedTypePointer  - Handel's switching between operator and id/number
+        expressionCounter    - Counts number of operands encountered.
+                               After encountering 2 the operator is handled and the counter is reset.
+        '''
+        expectedTypePointer = 0 
+        expressionCounter = 0   
+        operator = []
+        for token in calcList:
+            if expectedTypePointer:
+                if token[0] != "operator":
+                    return [0, "Syntax Error: Invalid type in expression. 'operator' expected"]
+                expectedTypePointer = 0
+                operator=token
+
+            else:
+                if not token[0] in ["id","number"]:
+                    return [0, "Syntax Error: Invalid type in expression. 'id' or 'number' expected"]
+                expectedTypePointer = 1
+                expressionCounter+=1
+                if expressionCounter==2:
+                    expressionCounter = 0
+                    operatorToCode(operator)
+
+                pushData = pushPop(token)
+
+                text("push "+pushData[0]+" "+str(pushData[1]))
+    
+        if not expectedTypePointer:
+            return [0, "Syntax Error: Expression ends in 'operator'. 'id' or 'number' expected"]
+
+        # handle calculation of expression
+
+        # text("push ??? ")
+    
+
+
+    text("pop "+popData[0]+" "+str(popData[1]))
+
+
+
+
+
+
+
+
+    return [1]
+    # token = lexer.getNextToken()
+    # print(token)
+
+    # token = lexer.getNextToken()
+    # print(token)
     
 
     # symbolIndex = symbolTable[1].index(token[1])
@@ -300,9 +401,8 @@ def let(token):
     # print("   ",symbolTable)
     # text("pop local "+varIndex)
 
-    return [1]
 
-    return [0, "'' expected"]
+    # return [0, "'' expected"]
 
 
 
