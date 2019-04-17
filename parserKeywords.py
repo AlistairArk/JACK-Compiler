@@ -301,10 +301,16 @@ def let(token):
             text("gt")
         elif token[1] == "<":
             text("lt")
-        elif token[1] == "And":
+        elif token[1] == "&": # token[1] == "And"
             text("and")
-        elif token[1] == "Or":
+        elif token[1] == "|": # token[1] == "Or"
             text("or")
+
+        elif token[1] == "*":
+            text("call mult 2")
+
+        elif token[1] == "/":
+            text("call div 2")
 
         # (commands neg and not are handled interdependently)
 
@@ -350,6 +356,7 @@ def let(token):
         expressionCounter = 0   
         operator = []
         for token in calcList:
+            print(token)
             if expectedTypePointer:
                 if token[0] != "operator":
                     return [0, "Syntax Error: Invalid type in expression. 'operator' expected"]
@@ -357,18 +364,28 @@ def let(token):
                 operator=token
 
             else:
+                
                 if not token[0] in ["id","number"]:
-                    return [0, "Syntax Error: Invalid type in expression. 'id' or 'number' expected"]
-                expectedTypePointer = 1
-                expressionCounter+=1
-                if expressionCounter==2:
-                    expressionCounter = 0
-                    operatorToCode(operator)
+                    if token[0] == "operator" and token[1] == "-":
+                        expressionCounter = 1
+                        operator = "neg"
+                    else:
+                        return [0, "Syntax Error: Invalid type in expression. 'id' or 'number' expected"]
+                else:
+                    expectedTypePointer = 1
+                    expressionCounter+=1
 
-                pushData = pushPop(token)
-
-                text("push "+pushData[0]+" "+str(pushData[1]))
+                    pushData = pushPop(token)
+                    text("push "+pushData[0]+" "+str(pushData[1]))
     
+                    if expressionCounter>=2:
+                        # expressionCounter = 0
+                        if operator!="neg":
+                            operatorToCode(operator)
+                        else:
+                            text("neg")
+
+
         if not expectedTypePointer:
             return [0, "Syntax Error: Expression ends in 'operator'. 'id' or 'number' expected"]
 
