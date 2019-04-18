@@ -1,43 +1,8 @@
 import lexer
+from symbolTable import *
+from codeGen import *
 
-output = ""
 tokenStack = []
-
-
-def text(dialogue):
-    global output
-    output += dialogue + "\n"
-
-
-#             type, symbol, index, scope
-symbolTable = [[],    [],        [],        []]
-
-symbolIndexList = [[],[]]
-def addSymbol(*args,**kwargs):
-
-    # Add new type to list of indexes as encountered
-    if not kwargs.get("type",0) in symbolIndexList[0]:
-        symbolIndexList[0].append(kwargs.get("type",0)) 
-        symbolIndexList[1].append(-1)
-
-    symbolIndex = symbolIndexList[0].index(kwargs.get("type",0))
-    symbolIndexList[1][symbolIndex] += 1 # Incriment index
-
-    symbolTable[0].append(kwargs.get("type",0))
-    symbolTable[1].append(kwargs.get("symbol",0))
-    symbolTable[2].append(kwargs.get("index",symbolIndexList[1][symbolIndex]))
-    symbolTable[3].append(kwargs.get("scope",0))
-
-    if kwargs.get("type",0) in ["function","class"]: # if function or class add to function stack
-        global semicolon
-        functionStack[0].append(kwargs.get("symbol",0))
-        functionStack[1].append(0)
-
-
-# Store list of identifiers as they are pushed to memorySegment
-memorySegment = []
-
-varList = []
 
 
 
@@ -138,99 +103,6 @@ def void(token):
     return [0, "'' expected"]
 
 
-'''
-In place of memorySegment we can write any of the following 8 keywords:
-
-static:       - used to access static (class level) variables
-argument:     - used to access the arguments (params) of the currently executing function
-local:        - used to access the local variables of the currently executing function
-this:         - used to access the current object (the object in which the current function resides)
-that:         - used to access another object.
-pointer:      - used to access a two location segment containing the ‘this’ (pointer[0]) and the ‘that’ (pointer[1]) pointers.
-temp:         - used to access an 8 location segment for storing temporary values (a register file)
-const:        - used to push a constant value into the stack.
-
-
-
-
-
-
-
-
-function int mult (int x, int y) {
-    var int result;
-    let result = 0;
-    while ~(x = 0) {
-        let result = result + y;
-        let x = x - 1;
-    }
-    return result;
-}
-
-
-
-function mult 1           // function int mult
-    push constant 0       // var int result;
-    pop local 0           // 
-label loop                // while
-    push argument 0       // x
-    push constant 0       // 0
-    eq                    // =
-    if-goto end           // 
-    push argument 1       // 
-    push local 0          // 
-    add                   // 
-    pop local 0           // 
-    push argument 0       // 
-    push constant 1       // 
-    sub                   // 
-    pop argument 0        // 
-    goto loop             // 
-label end                 // }
-
-    push local 0          // return result
-    return                // 
-
-
-
-
-
-
-
-
-// Declaring a var doesn't generate code
-// It simply adds some entries to the symbol table
-var int length;         // simply add a local variable to the table of local variables for this fucntion
-var int i, sum;         // This line doens't generate any code as well.
-
-let length = 12;
-let i = 0;
-let sum = 0;
-while (i < length){
-    let sum = sum + i;
-    let i = i + 1;
-}
-
-
-push constant 12
-pop local 0
-
-push constant 0
-pop local 1
-
-push constant 0
-pop local 2
-
-push local 1
-push local 0
-it
-
-
-
-
-'''
-
-
 
 
 
@@ -294,52 +166,9 @@ def field(token):
 
 
 
-
-
-
-
-
-def pushPop(token):
-    if token[0]=="number":
-        return ["constant", token[1]]
-    else:
-        # Get data for popping    
-        symbolIndex = symbolTable[1].index(token[1])
-        varIndex = symbolTable[2][symbolIndex]
-        varType  = symbolTable[0][symbolIndex]
-        return [varType, varIndex]
-
-def operatorToCode(token):
-    # ["+","-","*","/","&","|","~","<",">"]
-    
-    if token[1] == "+":
-        text("add")
-    elif token[1] == "-":
-        text("sub")
-    elif token[1] == ">":
-        text("gt")
-    elif token[1] == "<":
-        text("lt")
-    elif token[1] == "&": # token[1] == "And"
-        text("and")
-    elif token[1] == "|": # token[1] == "Or"
-        text("or")
-
-    elif token[1] == "*":
-        text("call mult 2")
-
-    elif token[1] == "/":
-        text("call div 2")
-
-
-
-
-
-
 #             type, symbol, index, scope
 
 def let(token):
-    calcList = [] # Stores list of tokens in calculation
 
 
 
@@ -367,12 +196,13 @@ def let(token):
 
 
 
-    while token[1]!=";":
-        calcList.append(token)
+    expr = []               # Stores list of tokens in expression
+    while token[1]!=";":    # Create a list of tokens which comprise the expression
+        expr.append(token)
         token = lexer.getNextToken()
 
-    if len(calcList) == 1:
-        text("push constant "+str(calcList[0][1]))
+    if len(expr) == 1:
+        text("push constant "+str(expr[0][1]))
     else: # Handle expression
 
         '''
@@ -385,7 +215,7 @@ def let(token):
         expectedTypePointer = 0 
         expressionCounter = 0   
         operator = []
-        for token in calcList:
+        for token in expr:
             if expectedTypePointer:
                 if token[0] != "operator":
                     return [0, "Syntax Error: Invalid type in expression. 'operator' expected"]
@@ -475,6 +305,8 @@ def Else(token):
 
 
 
+
+
 labelCounter = 0    # Increment counter as new labels are created
 labelStack = []     # Close loops as they are created
 def While(token):
@@ -483,11 +315,16 @@ def While(token):
     labelStack.append(["l"+str(labelCounter), bracketPointer[0]]) # Store label name and scope
     
     text("label "+labelStack[-1][0])
+
+    expr = [] # Stores list of tokens in expression
+    while lexer.peekNextToken()[1]!="{":
+        expr.append(lexer.getNextToken())
+
+    orderExpr(expr)
+
     return [1]
 
     # return [0, "'' expected"]
-
-
 
 
 
@@ -497,8 +334,7 @@ def Return(token):
 
     token = lexer.getNextToken()
     if token[1]==";":
-        token = lexer.peekNextToken()
-        if token[1]!="}":
+        if lexer.peekNextToken()[1]!="}":
             return [0, "Semantic Error: Unreachable code"]
 
     elif token[0] in ["id"]:        # Validate token type
@@ -539,7 +375,6 @@ def this(token):
 #                 {  (  [
 bracketPointer = [1, 1, 1]
 def symbol(token):
-
 
     if token[1]=="{":
         bracketPointer[0]+=1

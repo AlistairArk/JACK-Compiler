@@ -7,7 +7,7 @@ The program does not crash or become unstable if the source file contains any ki
 Both the lexer and parser have been tested using the provided JACK source files and are shown to function properly without any issues. 
 '''
 
-import lexer, parserKeywords
+import lexer, parserKeywords, codeGen
 
 '''
 note:
@@ -45,17 +45,13 @@ def parseFile():
         token = lexer.getNextToken()
 
     print("\n===== ===== ===== ===== ===== ===== ===== =====\n")
-    print(parserKeywords.output)
+    print(codeGen.output)
 
 
 
 
 
 def stmt(token):
-    print(token)
-    
-    # token = lexer.getNextToken()
-    
 
     if token[0] == "keyword":        
         if token[0] in lexer.keywords:
