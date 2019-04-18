@@ -74,7 +74,6 @@ def function(token): # function int mult
 
     # Check function has appropriate type and name
     token = lexer.getNextToken()
-    print(token)
     if token[0] != "id":
         return [0, "'id' expected"]
 
@@ -111,7 +110,7 @@ def function(token): # function int mult
             expectedTypePointer = 0
 
 
-    token = lexer.getNextToken()
+    token = lexer.peekNextToken()
     if token[1]!="{":
         return [0, "'{' expected"]
 
@@ -372,7 +371,6 @@ def let(token):
         calcList.append(token)
         token = lexer.getNextToken()
 
-    print(calcList)
     if len(calcList) == 1:
         text("push constant "+str(calcList[0][1]))
     else: # Handle expression
@@ -388,7 +386,6 @@ def let(token):
         expressionCounter = 0   
         operator = []
         for token in calcList:
-            print(token)
             if expectedTypePointer:
                 if token[0] != "operator":
                     return [0, "Syntax Error: Invalid type in expression. 'operator' expected"]
@@ -427,30 +424,7 @@ def let(token):
     text("pop "+popData[0]+" "+str(popData[1]))
 
 
-
-
-
-
-
-
     return [1]
-    # token = lexer.getNextToken()
-    # print(token)
-
-    # token = lexer.getNextToken()
-    # print(token)
-    
-
-    # symbolIndex = symbolTable[1].index(token[1])
-    
-    # varType     = str(symbolTable[1].index(token[1]))
-    # print("   ",symbolTable)
-    # text("pop local "+varIndex)
-
-
-    # return [0, "'' expected"]
-
-
 
 
 
@@ -478,7 +452,6 @@ def If(token):
 
         while bracketOpenCount:
             token = lexer.getNextToken()
-            # print(token)
 
 
             if token[1]=="(":
@@ -495,7 +468,7 @@ def If(token):
         return [0, "'(' expected"]
 
 def Else(token):
-    if lexer.getNextToken()[1]=="{":
+    if lexer.peekNextToken()[1]=="{":
         return [1]
     else:
         return [0, "'{' expected"]
@@ -507,9 +480,9 @@ labelStack = []     # Close loops as they are created
 def While(token):
     global labelCounter
     labelCounter+=1
-    labelStack.append("l"+str(labelCounter))
+    labelStack.append(["l"+str(labelCounter), bracketPointer[0]]) # Store label name and scope
     
-    text("label "+labelStack[-1])
+    text("label "+labelStack[-1][0])
     return [1]
 
     # return [0, "'' expected"]
@@ -521,17 +494,23 @@ def While(token):
 
 
 def Return(token):
-    text("return")
 
     token = lexer.getNextToken()
-    if token[1]!=";":
-        return [0, "';' expected"]
-    
-    # pushPop(token)
+    if token[1]==";":
+        token = lexer.peekNextToken()
+        if token[1]!="}":
+            return [0, "Semantic Error: Unreachable code"]
 
+    elif token[0] in ["id"]:        # Validate token type
+        pushData = pushPop(token)   # Push Result
+        text("push "+pushData[0]+" "+str(pushData[1]))
+
+
+    else:
+        return [0, "Syntax Error: Unexpected token of type '"+token[0]+"' cannot be returned."]
+
+    text("return")
     return [1]
-
-
 
 
 
@@ -555,3 +534,39 @@ def this(token):
     return [1, token]
 
     return [0, "'' expected"]
+
+
+#                 {  (  [
+bracketPointer = [1, 1, 1]
+def symbol(token):
+
+
+    if token[1]=="{":
+        bracketPointer[0]+=1
+    if token[1]=="}":
+        bracketPointer[0]-=1
+        if not bracketPointer[0]:
+            return [0, "Semantic Error: mismatched number of braces"]
+
+    if token[1]=="(":
+        bracketPointer[1]+=1
+    if token[1]==")":
+        bracketPointer[1]-=1
+        if not bracketPointer[1]:
+            return [0, "Semantic Error: mismatched number of parenthesis"]
+
+    if token[1]=="[":
+        bracketPointer[2]+=1
+    if token[1]=="]":
+        bracketPointer[2]-=1
+        if not bracketPointer[2]:
+            return [0, "Semantic Error: mismatched number of square brackets"]
+
+    # for item in bracketPointer:
+    #     if not item:
+    #         print("wowee")
+    #         return [0, "mismatched parenthesis."]
+
+    return[1]
+
+

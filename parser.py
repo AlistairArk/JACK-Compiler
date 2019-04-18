@@ -39,11 +39,10 @@ def OK(token):
 
 def parseFile():
 
-    token = lexer.peekNextToken ()
+    token = lexer.getNextToken()
     while (token[0] != "EOF"):
-        stmt()
-        token = lexer.peekNextToken()
-
+        stmt(token)
+        token = lexer.getNextToken()
 
     print("\n===== ===== ===== ===== ===== ===== ===== =====\n")
     print(parserKeywords.output)
@@ -52,14 +51,11 @@ def parseFile():
 
 
 
-
-def stmt():
+def stmt(token):
+    print(token)
     
-    token = lexer.getNextToken()
+    # token = lexer.getNextToken()
     
-
-
-
 
     if token[0] == "keyword":        
         if token[0] in lexer.keywords:
@@ -76,11 +72,17 @@ def stmt():
             Error(token, data[1])
 
 
-    elif token[0] in "symbol":        
+    elif token[0] in "symbol":
+        print("ahh")
         if token[1] in lexer.symbols:        
-            OK(token) # be happy
+            data = parserKeywords.symbol(token) 
+            if data[0]:
+                OK(token) # Accept the token
+            else:
+                Error(token, data[1])
         else:
             Error(token, "unknown symbol")
+
 
     elif token[0] in "operator":        
         if token[1] in lexer.operators:        

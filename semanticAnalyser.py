@@ -113,7 +113,7 @@ def main(token):
         
         semicolon -= 1
         if semicolon==-1:
-            Error(token, "mismatched number of semicolons")
+            Error(token, "mismatched number of braces")
 
 
 
