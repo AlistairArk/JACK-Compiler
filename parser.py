@@ -73,7 +73,6 @@ def stmt(token):
 
 
     elif token[0] in "symbol":
-        print("ahh")
         if token[1] in lexer.symbols:        
             data = parserKeywords.symbol(token) 
             if data[0]:

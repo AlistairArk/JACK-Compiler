@@ -547,6 +547,13 @@ def symbol(token):
         bracketPointer[0]-=1
         if not bracketPointer[0]:
             return [0, "Semantic Error: mismatched number of braces"]
+        else:
+            # Check stack to detect closing of if or while loop
+            for item in labelStack:
+                if item[1]==bracketPointer[0]:
+                    text("goto "+item[0])
+                    text(item[0]+" end")
+                    labelStack.pop()
 
     if token[1]=="(":
         bracketPointer[1]+=1
