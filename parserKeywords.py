@@ -241,32 +241,25 @@ def var(token):
     token = lexer.getNextToken()
     if not token[1] in ["int", "boolean", "char", "void"]:
         return [0, "'' expected"]
-                # addSymbol(type="argument", symbol=token[1], scope="")
 
-    print("\n\n")
 
-    tokenSwitch = 1
+    # Check syntax of variables and add them to the symbol table
+    tokenSwitch = 1 # Switch between checking for id and symbol with each loop
     while token[1]!=";":
         token = lexer.getNextToken()
 
         if token[1]!=";":
             if tokenSwitch:
                 if token[0]!="id":
-                    # print(token)
-                    return [0, "identifier expected"]
+                    return [0, "Syntax Error: Identifier expected"]
                 else:
                     addSymbol(type="local", symbol=token[1], scope="")
-
                 tokenSwitch = 0
             else:        
                 if token[0]!="symbol" and token[1]!="," :
-                    return [0, "symbol expected"]
+                    return [0, "Syntax Error: Symbol expected"]
                 else:
                     tokenSwitch = 1
-
-        # token = lexer.peekNextToken()
-        # tokenStack.append(token) 
-        # print(tokenStack[-1])
 
     return [1]
 
@@ -297,43 +290,59 @@ def field(token):
 
 
 
+
+
+
+
+
+
+
+
+
+
+def pushPop(token):
+    if token[0]=="number":
+        return ["constant", token[1]]
+    else:
+        # Get data for popping    
+        symbolIndex = symbolTable[1].index(token[1])
+        varIndex = symbolTable[2][symbolIndex]
+        varType  = symbolTable[0][symbolIndex]
+        return [varType, varIndex]
+
+def operatorToCode(token):
+    # ["+","-","*","/","&","|","~","<",">"]
+    
+    if token[1] == "+":
+        text("add")
+    elif token[1] == "-":
+        text("sub")
+    elif token[1] == ">":
+        text("gt")
+    elif token[1] == "<":
+        text("lt")
+    elif token[1] == "&": # token[1] == "And"
+        text("and")
+    elif token[1] == "|": # token[1] == "Or"
+        text("or")
+
+    elif token[1] == "*":
+        text("call mult 2")
+
+    elif token[1] == "/":
+        text("call div 2")
+
+
+
+
+
+
 #             type, symbol, index, scope
 
 def let(token):
     calcList = [] # Stores list of tokens in calculation
 
 
-    def pushPop(token):
-        if token[0]=="number":
-            return ["constant", token[1]]
-        else:
-            # Get data for popping    
-            symbolIndex = symbolTable[1].index(token[1])
-            varIndex = symbolTable[2][symbolIndex]
-            varType  = symbolTable[0][symbolIndex]
-            return [varType, varIndex]
-
-    def operatorToCode(token):
-        # ["+","-","*","/","&","|","~","<",">"]
-        
-        if token[1] == "+":
-            text("add")
-        elif token[1] == "-":
-            text("sub")
-        elif token[1] == ">":
-            text("gt")
-        elif token[1] == "<":
-            text("lt")
-        elif token[1] == "&": # token[1] == "And"
-            text("and")
-        elif token[1] == "|": # token[1] == "Or"
-            text("or")
-
-        elif token[1] == "*":
-            text("call mult 2")
-
-        elif token[1] == "/":
-            text("call div 2")
 
         # (commands neg and not are handled interdependently)
 
@@ -412,10 +421,7 @@ def let(token):
         if not expectedTypePointer:
             return [0, "Syntax Error: Expression ends in 'operator'. 'id' or 'number' expected"]
 
-        # handle calculation of expression
 
-        # text("push ??? ")
-    
 
 
     text("pop "+popData[0]+" "+str(popData[1]))
@@ -496,19 +502,38 @@ def Else(token):
 
 
 
+labelCounter = 0    # Increment counter as new labels are created
+labelStack = []     # Close loops as they are created
 def While(token):
+    global labelCounter
+    labelCounter+=1
+    labelStack.append("l"+str(labelCounter))
+    
+    text("label "+labelStack[-1])
     return [1]
 
-    return [0, "'' expected"]
+    # return [0, "'' expected"]
+
+
+
+
 
 
 
 def Return(token):
     text("return")
-    if lexer.getNextToken()[1]!=";":
+
+    token = lexer.getNextToken()
+    if token[1]!=";":
         return [0, "';' expected"]
     
+    # pushPop(token)
+
     return [1]
+
+
+
+
 
 
 def true(token):

@@ -10,6 +10,7 @@ def loadFile(filename):
     lexer.lineNum = 0
     lexer.peekFlag = 0
     lexer.posTemp = 0
+    lexer.lineNum=1
 
 def main(args):
     print(args)

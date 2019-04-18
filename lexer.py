@@ -15,7 +15,7 @@ properly without any issues.
 file = open("source.jack", "r").read()+" " # Loads the test file
 fileLen = len(file)
 pos = -1
-lineNum = 0
+lineNum = 1
 
 
 tokenType = ["keyword","operator","symbol"] # ,"integer_number","identifier","punctuator"]
@@ -50,9 +50,10 @@ tokens = [
 
 
 def getNextToken():
-    global pos, peekFlag, posTemp
+    global pos,peekFlag,posTemp,lineNum
     if peekFlag:
         pos = posTemp               # Revert Pointer state 
+        lineNum = lineNumTemp       # Revert line num state 
         peekFlag = 0
 
     token = consumeToken()
@@ -74,6 +75,12 @@ def consumeToken():
             C = -1
             return ["EOF"]
     C = file[pos]
+
+
+    if C == "\n":
+        lineNum+=1 # incriment line counter
+        pos+=1 # Incriment pointer
+        return consumeToken() # Get next token
 
 
     # If C is the start symbol of a comment then skip all the characters in the body of the comment
@@ -142,23 +149,25 @@ def consumeToken():
         if C in tokens[i]:
             return [tokenType[i],C,lineNum] 
 
-    if C == "\n":
-        lineNum+=1 # incriment line counter
-        return consumeToken() # Get next token
-    else:
-        return ["symbol",C,lineNum]
+    # if C == "\n":
+    #     lineNum+=1 # incriment line counter
+    #     return consumeToken() # Get next token
+    # else:
+    return ["symbol",C,lineNum]
         
     
 
 peekFlag = 0
 posTemp = 0
+lineNumTemp = 0
 def peekNextToken():
     '''When this function is called it will return the next available token in the input stream, but the token is not consumed (i.e. it will stay in the input). So, the next time the parser calls GetNextToken, or PeekNextToken, it gets this same token.'''
-    global pos, peekFlag, posTemp
+    global pos, peekFlag, posTemp, lineNumTemp
 
     if not peekFlag:
         peekFlag = 1
-        posTemp = pos               # Save Current State of Pointer   
+        posTemp = pos               # Save Current State of Pointer  
+        lineNumTemp = lineNum       # Save Current State of line number  
 
     nextToken = consumeToken()  # Get Next Token
     return nextToken            # Return Token

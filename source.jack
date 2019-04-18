@@ -1,4 +1,3 @@
-/**
 function int mult (int x, int y) {
     var int result;
     let result = 0;
@@ -8,14 +7,3 @@ function int mult (int x, int y) {
     }
     return result;
 }
-
-*/
-
-var int length;         // simply add a local variable to the table of local variables for this fucntion
-var int i, sum;         // This line doens't generate any code as well.
-
-let length = 12;
-let i = 0;
-let sum = 0;
-
-return;
