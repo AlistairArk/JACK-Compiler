@@ -89,16 +89,19 @@ def consumeToken():
         while file[pos]!="\n":
             string+=file[pos]
             pos+=1
-            if file[pos] == "\n":
-                lineNum+=1
+
+        lineNum+=1
         pos+=1 # Jump 1 to remove newline (\n)
         return consumeToken() # go back to 1.
     
-    if C == "/" and file[pos+1]=="*":# comment out /**
+    if C == "/" and file[pos+1]=="*":# comment out /* */
         pos+=1
         while file[pos]!="*" or file[pos+1]!="/":
+            if file[pos] == "\n":
+                lineNum+=1
             pos+=1
-        pos+=1 # Jump 1 to remove end character (*/)
+
+        pos+=2 # Jump 2 to remove end character (*/)
         return consumeToken() # go back to 1. 
 
 
@@ -183,4 +186,4 @@ def main():
         print("".join(str(word).ljust(20) for word in token)) # print token
         token = getNextToken()
 
-# main()
+main()
