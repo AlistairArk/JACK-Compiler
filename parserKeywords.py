@@ -168,9 +168,9 @@ def let(token):
 
 
     token = lexer.getNextToken()
-    if token[0]!="symbol":
-        return [0, "'id' expected"]
-    elif token[1]!="=":
+    # if token[0]!="symbol":
+    #     return [0, "'id' expected"]
+    if token[1]!="=":
         return [0, "'=' expected"]
 
 
@@ -234,10 +234,7 @@ def let(token):
             return [0, "Syntax Error: Expression ends in 'operator'. 'id' or 'number' expected"]
 
 
-
-
     text("pop "+popData[0]+" "+str(popData[1]))
-
 
     return [1]
 
@@ -264,10 +261,8 @@ def If(token):
     if token[1]=="(":
         bracketOpenCount+=1 # Insure same number of bracket opens as closes
 
-
         while bracketOpenCount:
             token = lexer.getNextToken()
-
 
             if token[1]=="(":
                 bracketOpenCount+=1

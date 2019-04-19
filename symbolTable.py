@@ -52,10 +52,16 @@ def operatorToCode(token):
         text("add")
     elif token[1] == "-":
         text("sub")
+    elif token[1] == "neg":
+        text("neg")
     elif token[1] == ">":
         text("gt")
     elif token[1] == "<":
         text("lt")
+    elif token[1] == "=":
+        text("eq")
+    elif token[1] == "~":
+        text("not")
     elif token[1] == "&": # token[1] == "And"
         text("and")
     elif token[1] == "|": # token[1] == "Or"
@@ -70,49 +76,76 @@ def operatorToCode(token):
 
 
 def expressionToCode(expr):
+    exprLen = len(expr)    # Get the length of the expression
 
-    expectedTypePointer = 0 
-    expressionCounter = 0   
-    operator = []
+    # Check what type the expression starts with
+    if expr[0][0] == "operator":
+        exprSwitch=1
+    elif expr[0][0] in ["id","number"]:
+        exprSwitch=0
+
+
+
+    operator = ""
+    pos=0
     for token in expr:
-        if expectedTypePointer:
+        pos+=1
+        print(token,pos,len(expr),exprSwitch)
+        # print(token)
+        if exprSwitch:
+            exprSwitch = 0
+            print
             if token[0] != "operator":
                 return [0, "Syntax Error: Invalid type in expression. 'operator' expected"]
-            expectedTypePointer = 0
             operator=token
+            print("ooh")
+            if pos==len(expr):          # if end of expression is reached 
+                print("ahh")
+                operatorToCode(token)   # output token
 
-        else:
-            
-            if not token[0] in ["id","number"]:
-                if token[0] == "operator" and token[1] == "-":
-                    expressionCounter = 1
-                    operator = "neg"
-                else:
-                    return [0, "Syntax Error: Invalid type in expression. 'id' or 'number' expected"]
-            else:
-                expectedTypePointer = 1
-                expressionCounter+=1
+        else:            
+            exprSwitch = 1
 
-                pushData = pushPop(token)
-                text("push "+pushData[0]+" "+str(pushData[1]))
+            pushData = pushPop(token)
+            text("push "+pushData[0]+" "+str(pushData[1]))
 
-                if expressionCounter>=2:
-                    # expressionCounter = 0
-                    if operator!="neg":
-                        operatorToCode(operator)
-                    else:
-                        text("neg")
+            if pos>1:
+                # if operator!="neg":
+                operatorToCode(operator)
+                # else:
+                #     text("neg")
 
 
 
 import copy
 def orderExpr(expr):
+
+    # Discern sub between neg and overwrite token
+    neg = 1 # While true convert all '-' to 'neg'
+    for i in range(len(expr)):
+        if neg and expr[i][1] == "-":           # Set neg if neg enabled
+                expr[i][1] = "neg"
+                neg = 0
+
+        elif expr[i][0] in ["id","number"]:     # Disable neg if number
+            neg = 0
+
+        elif expr[i][1] == "=":                 # Enable neg if equal
+            neg = 1
+
+    #     print(expr[i][1])
+
+
+    # print(expr)
+    # print()
+
+
+
+
     '''
     Calculates depth of parenthesized expressions 
     in order to handle them in the correct order. 
     '''
-
-    print(expr)
 
     result = [[[],0]]
     depth = 0
@@ -144,11 +177,6 @@ def orderExpr(expr):
 
 
 
-    print("\n",result)
-
-    print("\n")
-
-
     # Get order of bracketed expressions
     exprOrder = []
     depth = 0
@@ -162,17 +190,11 @@ def orderExpr(expr):
             pos = count
 
     while len(result):
-        # print(result,pos)
-
-   
-
-        # print(result[pos])
         if pos==len(result)-1 or result[pos+1][1]<=depth:
-            # print("     >",result[pos])
-
 
             # Generate code in order of expressions 
-            print("     >",result[pos])
+            print(">",result[pos])
+            expressionToCode(result[pos][0])
             result.remove(result[pos])
 
             if len(result):
@@ -189,10 +211,6 @@ def orderExpr(expr):
                         depth = result[count][1]
                         pos = count
 
-                # print(result[pos])
-            # print(exprOrder)
-            # return
-
         else: 
             pos+=1
 
@@ -207,8 +225,9 @@ def orderExpr(expr):
 
 
 # orderExpr([['operator', '~', 4], ['symbol', '(', 4], ['id', 'x', 4], ['symbol', '=', 4], ['symbol', '(', 4], ['number', '0', 4], ['operator', '+', 4], ['number', '1', 4], ['symbol', ')', 4], ['symbol', ')', 4]])
+# orderExpr([['operator', '~', 4], ['symbol', '(', 4],  ['id', 'x', 4],['id', '-', 4],['id', 'x', 4], ['symbol', '=', 4], ['symbol', '-', 4], ['symbol', '(', 4], ['number', '0', 4], ['operator', '+', 4], ['number', '1', 4], ['symbol', ')', 4], ['symbol', ')', 4]])
 
-print(orderExpr([['operator', '~', 4], ['symbol', '(', 4], ['id', 'x', 4], ['symbol', '=', 4], ['symbol', '(', 4], ['number', '0', 4], ['operator', '+', 4], ['symbol', '(', 4], ['number', '1', 4], ['operator', '*', 4], ['number', '5', 4], ['symbol', ')', 4], ['symbol', ')', 4], ['operator', '+', 4], ['symbol', '(', 4], ['number', '4', 4], ['operator', '*', 4], ['number', '6', 4], ['symbol', ')', 4], ['symbol', ')', 4]]))
+# print(orderExpr([['operator', '~', 4], ['symbol', '(', 4], ['id', 'x', 4], ['symbol', '=', 4], ['symbol', '(', 4], ['number', '0', 4], ['operator', '+', 4], ['symbol', '(', 4], ['number', '1', 4], ['operator', '*', 4], ['number', '5', 4], ['symbol', ')', 4], ['symbol', ')', 4], ['operator', '+', 4], ['symbol', '(', 4], ['number', '4', 4], ['operator', '*', 4], ['number', '6', 4], ['symbol', ')', 4], ['symbol', ')', 4]]))
 # print("\n\n")
 # print(output)
 

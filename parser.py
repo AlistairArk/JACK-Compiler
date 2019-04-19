@@ -44,8 +44,8 @@ def parseFile():
         stmt(token)
         token = lexer.getNextToken()
 
-    print("\n===== ===== ===== ===== ===== ===== ===== =====\n")
-    print(codeGen.output)
+    # print("\n===== ===== ===== ===== ===== ===== ===== =====\n")
+    # print(codeGen.output)
 
 
 

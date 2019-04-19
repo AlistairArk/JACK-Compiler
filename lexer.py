@@ -33,14 +33,14 @@ symbols =  ["(",")",   # Used for grouping arethmetic expressions and enclosing 
             "{","}",   # Used for grouping program units and statements
             ",",       # Variable list seperatior
             ";",       # Statement terminator
-            "=",       # Assignment and comparison operator
+            # "=",       # Assignment and comparison operator
             "."        # Class membership
             ]
 
 # JACK - Standard Library
 stdlib = ["Math","String","Array","Output","Screen","Memory","Keyboard","Sys"]
 
-operators = ["+","-","*","/","&","|","~","<",">"]
+operators = ["=","+","-","*","/","&","|","~","<",">"]
 
 tokens = [
         keywords,       # Keywords
