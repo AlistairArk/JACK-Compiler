@@ -154,25 +154,10 @@ def field(token):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 #             type, symbol, index, scope
-
 def let(token):
 
-
-
-        # (commands neg and not are handled interdependently)
+    # (commands neg and not are handled interdependently)
 
     token = lexer.getNextToken()
 

@@ -28,12 +28,6 @@ def addSymbol(*args,**kwargs):
         functionStack[1].append(0)
 
 
-# Store list of identifiers as they are pushed to memorySegment
-memorySegment = []
-
-varList = []
-
-
 
 
 
@@ -75,11 +69,43 @@ def operatorToCode(token):
 
 
 
+def expressionToCode(expr):
+
+    expectedTypePointer = 0 
+    expressionCounter = 0   
+    operator = []
+    for token in expr:
+        if expectedTypePointer:
+            if token[0] != "operator":
+                return [0, "Syntax Error: Invalid type in expression. 'operator' expected"]
+            expectedTypePointer = 0
+            operator=token
+
+        else:
+            
+            if not token[0] in ["id","number"]:
+                if token[0] == "operator" and token[1] == "-":
+                    expressionCounter = 1
+                    operator = "neg"
+                else:
+                    return [0, "Syntax Error: Invalid type in expression. 'id' or 'number' expected"]
+            else:
+                expectedTypePointer = 1
+                expressionCounter+=1
+
+                pushData = pushPop(token)
+                text("push "+pushData[0]+" "+str(pushData[1]))
+
+                if expressionCounter>=2:
+                    # expressionCounter = 0
+                    if operator!="neg":
+                        operatorToCode(operator)
+                    else:
+                        text("neg")
 
 
 
-
-
+import copy
 def orderExpr(expr):
     '''
     Calculates depth of parenthesized expressions 
@@ -90,77 +116,99 @@ def orderExpr(expr):
 
     result = [[[],0]]
     depth = 0
-    count = 0
+    pos = 0
     # pos = 0
     for token in expr:
         if token[1]=="(":
-            result.append([[],0])
             depth+=1
-            count+=1
+            pos+=1
+            result.append([[],depth])
 
         elif token[1]==")":
             depth-=1
+            pos+=1
+            result.append([[],depth])
 
         else:
-            result[count][0].append(token)
-            result[count][1] = depth
+            result[pos][0].append(token)
 
-
-    reuslt = result.sort(key=lambda x: x[1], reverse = True) # Sort list
-
-    # Generate code in 
+    # Remove empty lists
+    removeStack = []
     for item in result:
-        expr = item[0]
-        print("\n")
-        print(expr)
-        expectedTypePointer = 0 
-        expressionCounter = 0   
-        operator = []
-        for token in expr:
-            if expectedTypePointer:
-                if token[0] != "operator":
-                    return [0, "Syntax Error: Invalid type in expression. 'operator' expected"]
-                expectedTypePointer = 0
-                operator=token
+        if item[0]==[]:
+            removeStack.append(item)
 
-            else:
-                
-                if not token[0] in ["id","number"]:
-                    if token[0] == "operator" and token[1] == "-":
-                        expressionCounter = 1
-                        operator = "neg"
-                    else:
-                        return [0, "Syntax Error: Invalid type in expression. 'id' or 'number' expected"]
-                else:
-                    expectedTypePointer = 1
-                    expressionCounter+=1
 
-                    pushData = pushPop(token)
-                    text("push "+pushData[0]+" "+str(pushData[1]))
+    for item in removeStack:
+        result.remove(item)
+
+
+
+    print("\n",result)
+
+    print("\n")
+
+
+    # Get order of bracketed expressions
+    exprOrder = []
+    depth = 0
+
+    # Check for starting potential depths
+    count = -1
+    for item in result:
+        count+=1
+        if result[count][1]>depth:
+            depth = result[count][1]
+            pos = count
+
+    while len(result):
+        # print(result,pos)
+
+   
+
+        # print(result[pos])
+        if pos==len(result)-1 or result[pos+1][1]<=depth:
+            # print("     >",result[pos])
+
+
+            # Generate code in order of expressions 
+            print("     >",result[pos])
+            result.remove(result[pos])
+
+            if len(result):
+                if pos:
+                    pos -= 1    # Switch to next item
+
+                depth = result[pos][1] # set new depth
+
+                # Check for higher potential depths
+                count = -1
+                for item in result:
+                    count+=1
+                    if result[count][1]>depth:
+                        depth = result[count][1]
+                        pos = count
+
+                # print(result[pos])
+            # print(exprOrder)
+            # return
+
+        else: 
+            pos+=1
+
+
+
+
+
+
+
     
-                    if expressionCounter>=2:
-                        # expressionCounter = 0
-                        if operator!="neg":
-                            operatorToCode(operator)
-                        else:
-                            text("neg")
 
 
-
-
-
-
-
-
-
-
-
-    print("\n\n")
-    print(result)
 
 # orderExpr([['operator', '~', 4], ['symbol', '(', 4], ['id', 'x', 4], ['symbol', '=', 4], ['symbol', '(', 4], ['number', '0', 4], ['operator', '+', 4], ['number', '1', 4], ['symbol', ')', 4], ['symbol', ')', 4]])
 
-# print(orderExpr([['operator', '~', 4], ['symbol', '(', 4], ['id', 'x', 4], ['symbol', '=', 4], ['symbol', '(', 4], ['number', '0', 4], ['operator', '+', 4], ['symbol', '(', 4], ['number', '1', 4], ['operator', '*', 4], ['number', '5', 4], ['symbol', ')', 4], ['symbol', ')', 4], ['operator', '+', 4], ['symbol', '(', 4], ['number', '4', 4], ['operator', '*', 4], ['number', '6', 4], ['symbol', ')', 4], ['symbol', ')', 4]]))
+print(orderExpr([['operator', '~', 4], ['symbol', '(', 4], ['id', 'x', 4], ['symbol', '=', 4], ['symbol', '(', 4], ['number', '0', 4], ['operator', '+', 4], ['symbol', '(', 4], ['number', '1', 4], ['operator', '*', 4], ['number', '5', 4], ['symbol', ')', 4], ['symbol', ')', 4], ['operator', '+', 4], ['symbol', '(', 4], ['number', '4', 4], ['operator', '*', 4], ['number', '6', 4], ['symbol', ')', 4], ['symbol', ')', 4]]))
 # print("\n\n")
 # print(output)
 
