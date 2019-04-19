@@ -300,13 +300,19 @@ def While(token):
 def Return(token):
 
     token = lexer.getNextToken()
+
     if token[1]==";":
         if lexer.peekNextToken()[1]!="}":
             return [0, "Semantic Error: Unreachable code"]
 
-    elif token[0] in ["id"]:                                # Validate token type
-        pushData = pushPop(token)                           # Push Result
+    elif token[0] in ["id","number"]:                  # Validate token type
+        '''
+        This section may require further tweaking to make 
+        returning multiple values possible.
+        '''
+        pushData = pushPop(token)                      # Push Result
         text("push "+pushData[0]+" "+str(pushData[1]))
+
 
     else:
         return [0, "Syntax Error: Unexpected token of type '"+token[0]+"' cannot be returned."]
