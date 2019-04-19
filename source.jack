@@ -1,26 +1,25 @@
-/*
+
 function int mult (int x, int y) {
     var int result;
     let result = 0;
     while ~(x = 0) {
-//        let result = result + y;
+        let result = result + y;
         let x = x - 1;
     }
     return;
 }
-
-
-*/
-//function void main()
+/*
+function void main()
 {
 var int length;
 var int i, sum;
 let length = 12;
-//let i = 0;
-//let sum = 0;
+let i = 0;
+let sum = 0;
 while (i < length)
 {
 let sum = sum + i;
 let i = i + 1;
 }
 }
+*/

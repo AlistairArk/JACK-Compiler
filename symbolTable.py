@@ -78,6 +78,7 @@ def operatorToCode(token):
 def expressionToCode(expr):
     exprLen = len(expr)    # Get the length of the expression
 
+
     # Check what type the expression starts with
     if expr[0][0] == "operator":
         exprSwitch=1
@@ -114,7 +115,33 @@ def expressionToCode(expr):
 
 
 import copy
-def orderExpr(expr):
+def orderExpr(exprType):
+    if exprType in ["if","while"]:
+        ending = "{"
+    elif exprType in ["let"]:
+        ending = ";"
+
+    # Perform checks on the expression and wrap it up into a list
+    bracketOpenCount = 0
+    expr = [] # Stores list of tokens in expression
+    while lexer.peekNextToken()[1]!=ending:
+        if lexer.peekNextToken()[0] == "EOF":
+            return [0, "unexpected EOF, ')' expected"]
+        
+        token = lexer.getNextToken()
+        expr.append(token)
+
+        # Insure matching number of parenthesis
+        if token[1]=="(":
+            bracketOpenCount+=1
+        elif token[1]==")":
+            bracketOpenCount-=1
+
+
+    # print(expr)
+
+
+
 
     # Discern sub between neg and overwrite token
     neg = 1 # While true convert all '-' to 'neg'
@@ -214,8 +241,14 @@ def orderExpr(expr):
 
 
 
-
-
+#                 {  (  [
+bracketPointer = [1, 1, 1]
+labelCounter = 0    # Increment counter as new labels are created
+labelStack = []     # Close loops as they are created
+def newLabel():
+    global labelCounter
+    labelCounter+=1
+    labelStack.append(["l"+str(labelCounter), bracketPointer[0]]) # Store label name and scope
     
 
 
