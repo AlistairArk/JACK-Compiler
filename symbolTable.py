@@ -76,6 +76,7 @@ def operatorToCode(token):
 
 
 def expressionToCode(expr):
+    # print("> ",expr)
     exprLen = len(expr)    # Get the length of the expression
 
 
@@ -129,6 +130,7 @@ def orderExpr(exprType):
             return [0, "unexpected EOF, ')' expected"]
         
         token = lexer.getNextToken()
+
         expr.append(token)
 
         # Insure matching number of parenthesis

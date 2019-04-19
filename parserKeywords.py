@@ -135,48 +135,14 @@ def var(token):
     return [1]
 
 
-def static(token):
-    return [1]
+    # expr = []               # Stores list of tokens in expression
+    # while token[1]!=";":    # Create a list of tokens which comprise the expression
+    #     expr.append(token)
+    #     token = lexer.getNextToken()
 
-    return [0, "'' expected"]
+    # if len(expr) == 1:
+    #     text("push constant "+str(expr[0][1]))
 
-def field(token):
-    return [1]
-
-    return [0, "'' expected"]
-
-
-
-
-
-
-
-
-
-
-#             type, symbol, index, scope
-def let(token):
-
-    # (commands neg and not are handled interdependently)
-
-    token = lexer.getNextToken()
-    if token[0]!="id":
-        return [0, "'id' expected"]
-
-    popData = pushPop(token)
-
-
-    if lexer.getNextToken()[1]!="=":
-        return [0, "'=' expected"]
-
-    if lexer.peekNextToken()==";":
-        return [0, "expression expected"]
-
-    orderExpr("let")
-
-    text("pop "+popData[0]+" "+str(popData[1]))
-
-    return [1]
 
     # expr = []               # Stores list of tokens in expression
     # while token[1]!=";":    # Create a list of tokens which comprise the expression
@@ -238,6 +204,52 @@ def let(token):
 
 
 
+def static(token):
+    return [1]
+
+    return [0, "'' expected"]
+
+def field(token):
+    return [1]
+
+    return [0, "'' expected"]
+
+
+
+
+
+
+
+
+
+
+
+def let(token):
+
+    token = lexer.getNextToken()
+    if token[0]!="id":
+        return [0, "'id' expected"]
+
+    popData = pushPop(token)
+
+    if lexer.getNextToken()[1]!="=":
+        return [0, "'=' expected"]
+
+    orderExpr("let")
+    text("pop "+popData[0]+" "+str(popData[1]))
+
+    return [1]
+
+
+
+    # expr = []               # Stores list of tokens in expression
+    # while token[1]!=";":    # Create a list of tokens which comprise the expression
+    #     expr.append(token)
+    #     token = lexer.getNextToken()
+
+    # if len(expr) == 1:
+    #     text("push constant "+str(expr[0][1]))
+
 
 
 
@@ -250,8 +262,6 @@ def do(token):
 
 def If(token):
     token = lexer.getNextToken()
-
-
 
     newLabel()
     text("label "+labelStack[-1][0])    # While
@@ -275,14 +285,7 @@ def Else(token):
 def While(token):
     newLabel()
     
-
-    text("label "+labelStack[-1][0])
-    
-    # # Store list of tokens in expression
-    # expr = [] 
-    # while lexer.peekNextToken()[1]!="{":
-    #     expr.append(lexer.getNextToken())
-
+    text("label "+labelStack[-1][0])   
     orderExpr("while")                      # Generate expression code
     text("if-goto "+labelStack[-1][0])
 
@@ -301,10 +304,9 @@ def Return(token):
         if lexer.peekNextToken()[1]!="}":
             return [0, "Semantic Error: Unreachable code"]
 
-    elif token[0] in ["id"]:        # Validate token type
-        pushData = pushPop(token)   # Push Result
+    elif token[0] in ["id"]:                                # Validate token type
+        pushData = pushPop(token)                           # Push Result
         text("push "+pushData[0]+" "+str(pushData[1]))
-
 
     else:
         return [0, "Syntax Error: Unexpected token of type '"+token[0]+"' cannot be returned."]
@@ -367,10 +369,7 @@ def symbol(token):
         if not bracketPointer[2]:
             return [0, "Semantic Error: mismatched number of square brackets"]
 
-    # for item in bracketPointer:
-    #     if not item:
-    #         print("wowee")
-    #         return [0, "mismatched parenthesis."]
+
 
     return[1]
 
