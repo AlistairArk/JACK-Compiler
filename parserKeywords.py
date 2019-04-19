@@ -300,7 +300,8 @@ def While(token):
     while lexer.peekNextToken()[1]!="{":
         expr.append(lexer.getNextToken())
 
-    orderExpr(expr)
+    orderExpr(expr) # Generate expression code
+    text("if-goto "+"l"+str(labelCounter))
 
     return [1]
 

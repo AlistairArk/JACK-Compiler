@@ -90,17 +90,13 @@ def expressionToCode(expr):
     pos=0
     for token in expr:
         pos+=1
-        print(token,pos,len(expr),exprSwitch)
-        # print(token)
         if exprSwitch:
             exprSwitch = 0
             print
             if token[0] != "operator":
                 return [0, "Syntax Error: Invalid type in expression. 'operator' expected"]
             operator=token
-            print("ooh")
             if pos==len(expr):          # if end of expression is reached 
-                print("ahh")
                 operatorToCode(token)   # output token
 
         else:            
@@ -193,7 +189,7 @@ def orderExpr(expr):
         if pos==len(result)-1 or result[pos+1][1]<=depth:
 
             # Generate code in order of expressions 
-            print(">",result[pos])
+            # print(">",result[pos])
             expressionToCode(result[pos][0])
             result.remove(result[pos])
 
