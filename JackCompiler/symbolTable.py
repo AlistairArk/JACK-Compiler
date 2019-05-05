@@ -79,13 +79,24 @@ def expressionToCode(expr):
     # print("> ",expr)
     exprLen = len(expr)    # Get the length of the expression
 
-
+    print(expr)
     # Check what type the expression starts with
     if expr[0][0] == "operator":
         exprSwitch=1
     elif expr[0][0] in ["id","number"]:
         exprSwitch=0
 
+    elif expr[0][0] in ["string_literal"]:
+        text("push constant "+str(len(expr[0][1])))         # Push length of string
+        text("call String.new 1")                           # Call string function
+        for item in expr[0][1]:                             # Create string
+            text("push constant "+str(ord(item)))
+            text("call String.appendChar 2")
+        return
+
+    elif expr[0][0] in ["function"]:
+        text("call "+expr[0][1]+" 1")
+        return
 
 
     operator = ""
@@ -117,7 +128,7 @@ def expressionToCode(expr):
 
 import copy
 def orderExpr(exprType):
-    print("\n\n")
+    # print("\n\n")
     if exprType in ["if","while"]:
         ending = "{"
     elif exprType in ["let"]:
@@ -126,16 +137,17 @@ def orderExpr(exprType):
     # Perform checks on the expression and wrap it up into a list
     bracketOpenCount = 0
     expr = [] # Stores list of tokens in expression
+
     token = lexer.peekNextToken()
-    print(token)
-    
     while token[1]!=ending:
+        
+        token = lexer.getNextToken()    # Consume token
         if token[0] == "EOF":
             return [0, "unexpected EOF, ')' expected"]
-        
-        token = lexer.getNextToken()
+
+
         expr.append(token)
-        print(token)
+
 
         # Insure matching number of parenthesis
         if token[1]=="(":
@@ -145,6 +157,11 @@ def orderExpr(exprType):
 
         if bracketOpenCount==-1:
             return [0, "mismatched number of parenthesis"]
+        
+        # Check if next token implies the current token is a function call
+        token = lexer.peekNextToken()
+        if token[1]=="(":
+            expr[-1][0]="function"
 
     print(expr, bracketOpenCount)
 
@@ -164,11 +181,7 @@ def orderExpr(exprType):
         elif expr[i][1] == "=":                 # Enable neg if equal
             neg = 1
 
-    #     print(expr[i][1])
 
-
-    # print(expr)
-    # print()
 
 
 
@@ -224,7 +237,7 @@ def orderExpr(exprType):
         if pos==len(result)-1 or result[pos+1][1]<=depth:
 
             # Generate code in order of expressions 
-            # print(">",result[pos])
+            # print("     >",result[pos])
             expressionToCode(result[pos][0])
             result.remove(result[pos])
 

@@ -12,7 +12,8 @@ class Main {
      var int length;
      var int i, sum;
 
-     let length = Keyboard.readInt("How many numbers? ");
-     return;
+    let a[i] = Keyboard.readInt("Enter a number: ");
+
+    return;
    }
 }

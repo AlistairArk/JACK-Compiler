@@ -265,15 +265,38 @@ def let(token):
     if token[0]!="id":
         return [0, "'id' expected"]
 
-    popData = pushPop(token)
+    print("\n\n")
+    print(">>>>>>>>>",token)
+    # print(symbolTable)
+    # exit()
+    if lexer.peekNextToken()[1]=="[": # Check if array
+        lexer.getNextToken() # consume token
 
-    if lexer.getNextToken()[1]!="=":
-        return [0, "'=' expected"]
+        for item in [lexer.getNextToken(),token,["operator","+",token[2]]]:
+            print([item])
+            expressionToCode([item])
 
-    returnData = orderExpr("let")
-    if not returnData[0]:
-        return returnData
-    text("pop "+popData[0]+" "+str(popData[1]))
+        popData = pushPop(token)
+
+        exit()
+        # if lexer.getNextToken()[1]!="=":
+        #     return [0, "'=' expected"]
+
+        # returnData = orderExpr("let")
+        # if not returnData[0]:
+        #     return returnData
+        # text("pop "+popData[0]+" "+str(popData[1]))
+
+    else:
+        popData = pushPop(token)
+
+        if lexer.getNextToken()[1]!="=":
+            return [0, "'=' expected"]
+
+        returnData = orderExpr("let")
+        if not returnData[0]:
+            return returnData
+        text("pop "+popData[0]+" "+str(popData[1]))
 
     return [1]
 
