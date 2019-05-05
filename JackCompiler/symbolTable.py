@@ -140,7 +140,7 @@ def orderExpr(exprType):
             bracketOpenCount-=1
 
 
-    # print(expr)
+    print(expr)
 
 
 

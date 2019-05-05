@@ -43,6 +43,7 @@ def parseFile():
     while (token[0] != "EOF"):
         stmt(token)
         token = lexer.getNextToken()
+        print(token)
 
     # print("\n===== ===== ===== ===== ===== ===== ===== =====\n")
     # print(codeGen.output)

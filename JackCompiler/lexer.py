@@ -131,8 +131,12 @@ def consumeToken():
         if lexeme in tokens[tokenType.index("keyword")]:
             return ["keyword",lexeme,lineNum]
         else:
-            return ["id",lexeme,lineNum]
+            # Check if id is function call
+            token = ["id",lexeme,lineNum]
+            if peekNextToken()[1]=="." and peekNextToken()[0]=="id":
+                token[1] += getNextToken()[1]+getNextToken()[1]
 
+            return token
 
     # If C is a digit, it may be the first digit in a number, then:
     #       - Keep reading more digits, putting them into a string, until you hit a character that is not a digit. 
@@ -186,4 +190,4 @@ def main():
         print("".join(str(word).ljust(20) for word in token)) # print token
         token = getNextToken()
 
-# main()
+main()
