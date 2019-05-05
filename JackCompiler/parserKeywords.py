@@ -226,8 +226,37 @@ def field(token):
 
 
 
+'''
+function Main.main 4
+
+"How many numbers? "
+
+push constant 18                        call String.new 1
+push constant 72                        call String.appendChar 2
+push constant 111                       call String.appendChar 2
+push constant 119                       call String.appendChar 2
+push constant 32                        call String.appendChar 2
+push constant 109                       call String.appendChar 2
+push constant 97                        call String.appendChar 2
+push constant 110                       call String.appendChar 2
+push constant 121                       call String.appendChar 2
+push constant 32                        call String.appendChar 2
+push constant 110                       call String.appendChar 2
+push constant 117                       call String.appendChar 2
+push constant 109                       call String.appendChar 2
+push constant 98                        call String.appendChar 2
+push constant 101                       call String.appendChar 2
+push constant 114                       call String.appendChar 2
+push constant 115                       call String.appendChar 2
+push constant 63                        call String.appendChar 2
+push constant 32                        call String.appendChar 2
 
 
+call Keyboard.readInt 1                 pop local 1
+push constant 0
+return
+
+'''
 
 
 def let(token):
@@ -241,7 +270,9 @@ def let(token):
     if lexer.getNextToken()[1]!="=":
         return [0, "'=' expected"]
 
-    orderExpr("let")
+    returnData = orderExpr("let")
+    if not returnData[0]:
+        return returnData
     text("pop "+popData[0]+" "+str(popData[1]))
 
     return [1]

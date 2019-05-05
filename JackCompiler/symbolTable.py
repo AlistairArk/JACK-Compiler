@@ -117,6 +117,7 @@ def expressionToCode(expr):
 
 import copy
 def orderExpr(exprType):
+    print("\n\n")
     if exprType in ["if","while"]:
         ending = "{"
     elif exprType in ["let"]:
@@ -125,13 +126,16 @@ def orderExpr(exprType):
     # Perform checks on the expression and wrap it up into a list
     bracketOpenCount = 0
     expr = [] # Stores list of tokens in expression
-    while lexer.peekNextToken()[1]!=ending:
-        if lexer.peekNextToken()[0] == "EOF":
+    token = lexer.peekNextToken()
+    print(token)
+    
+    while token[1]!=ending:
+        if token[0] == "EOF":
             return [0, "unexpected EOF, ')' expected"]
         
         token = lexer.getNextToken()
-
         expr.append(token)
+        print(token)
 
         # Insure matching number of parenthesis
         if token[1]=="(":
@@ -140,7 +144,7 @@ def orderExpr(exprType):
             bracketOpenCount-=1
 
         if bracketOpenCount==-1:
-            return [0, "mismatched nuimber of parenthesis"]
+            return [0, "mismatched number of parenthesis"]
 
     print(expr, bracketOpenCount)
 
@@ -242,6 +246,7 @@ def orderExpr(exprType):
             pos+=1
 
 
+    return [1]
 
 
 

@@ -124,19 +124,20 @@ def consumeToken():
     #       - Put the string (lexeme) in a token with the proper token type (keyword or id) and return the token.
     if C.isalpha():
         lexeme = ""
+        
         while file[pos].isalpha():
             lexeme+=file[pos]
             pos+=1
+            if file[pos]==".":  # may need to add a check here so "." can only be added once
+                lexeme+=file[pos]
+                pos+=1
+
 
         if lexeme in tokens[tokenType.index("keyword")]:
             return ["keyword",lexeme,lineNum]
         else:
-            # Check if id is function call
-            token = ["id",lexeme,lineNum]
-            if peekNextToken()[1]=="." and peekNextToken()[0]=="id":
-                token[1] += getNextToken()[1]+getNextToken()[1]
+            return ["id",lexeme,lineNum]
 
-            return token
 
     # If C is a digit, it may be the first digit in a number, then:
     #       - Keep reading more digits, putting them into a string, until you hit a character that is not a digit. 
