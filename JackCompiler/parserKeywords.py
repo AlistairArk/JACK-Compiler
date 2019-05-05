@@ -50,7 +50,7 @@ def function(token): # function int mult
         return [0, "'(' expected"]
 
 
-    if lexer.peekNextToken()[1]==")":
+    if lexer.peekNextToken()[1]==")":   # Check if function has no arguments
         lexer.getNextToken()            # Consume the token
 
     else:
@@ -116,8 +116,8 @@ def void(token):
 
 def var(token):
     token = lexer.getNextToken()
-    if not token[1] in ["int", "boolean", "char", "void"]:
-        return [0, "'' expected"]
+    if not token[1] in ["int", "boolean", "char", "void", "Array"]:
+        return [0, "declared variable is of invalid type"]
 
 
     # Check syntax of variables and add them to the symbol table
