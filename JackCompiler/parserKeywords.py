@@ -49,30 +49,36 @@ def function(token): # function int mult
     if token[1]!="(":
         return [0, "'(' expected"]
 
-    ## Check syntax of function arguments
-    expectedTypeList = ["keyword","id","symbol"]
-    expectedTypePointer = 0
-    while token[1]!=")":
-        token = lexer.getNextToken()
-        
-        if token[0]!=expectedTypeList[expectedTypePointer]:
-            return [0, "'"+expectedTypeList[expectedTypePointer]+"' expected"]
-        
-        elif token[0] == "keyword":
-            if not token[1] in ["int", "boolean", "char"]: 
-                return [0, "unexpected keyword type"]
-        
-        elif token[0] == "id": # add variable to symbol table
-                addSymbol(type="argument", symbol=token[1], scope="")
 
-        elif token[0] == "symbol":
-            if not token[1] in [",", ")"]: 
-                return [0, "unexpected symbol type"]
+    if lexer.peekNextToken()[1]==")":
+        lexer.getNextToken()            # Consume the token
 
-        # incriment pointer
-        expectedTypePointer+=1
-        if expectedTypePointer == 3:
-            expectedTypePointer = 0
+    else:
+        ## Check syntax of function arguments
+        expectedTypeList = ["keyword","id","symbol"]
+        expectedTypePointer = 0
+        while token[1]!=")":
+            token = lexer.getNextToken()
+            print(token)
+            
+            if token[0]!=expectedTypeList[expectedTypePointer]:
+                return [0, "'"+expectedTypeList[expectedTypePointer]+"' expected"]
+            
+            elif token[0] == "keyword":
+                if not token[1] in ["int", "boolean", "char"]: 
+                    return [0, "unexpected keyword type"]
+            
+            elif token[0] == "id": # add variable to symbol table
+                    addSymbol(type="argument", symbol=token[1], scope="")
+
+            elif token[0] == "symbol":
+                if not token[1] in [",", ")"]: 
+                    return [0, "unexpected symbol type"]
+
+            # incriment pointer
+            expectedTypePointer+=1
+            if expectedTypePointer == 3:
+                expectedTypePointer = 0
 
 
     token = lexer.peekNextToken()

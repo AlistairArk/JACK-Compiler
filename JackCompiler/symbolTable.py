@@ -139,8 +139,10 @@ def orderExpr(exprType):
         elif token[1]==")":
             bracketOpenCount-=1
 
+        if bracketOpenCount==-1:
+            return [0, "mismatched nuimber of parenthesis"]
 
-    print(expr)
+    print(expr, bracketOpenCount)
 
 
 
