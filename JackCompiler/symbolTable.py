@@ -71,7 +71,7 @@ def operatorToCode(token):
         text("call mult 2")
 
     elif token[1] == "/":
-        text("call div 2")
+        text("call Math.divide 2")
 
 
 

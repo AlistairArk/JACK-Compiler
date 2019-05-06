@@ -47,7 +47,9 @@ def parseFile():
 
     print("\n===== ===== ===== ===== ===== ===== ===== =====\n")
     print(codeGen.output)
-
+    f = open("source.vm", "a")
+    f.write(codeGen.output)
+    f.close()
 
 
 
