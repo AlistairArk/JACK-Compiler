@@ -68,7 +68,7 @@ def operatorToCode(token):
         text("or")
 
     elif token[1] == "*":
-        text("call mult 2")
+        text("call Math.multiply 2")
 
     elif token[1] == "/":
         text("call Math.divide 2")
@@ -95,7 +95,23 @@ def expressionToCode(expr):
         return
 
     elif expr[0][0] in ["function"]:
-        text("call "+expr[0][1]+" 1")
+        print("\n\n\n\n",expr)
+
+        # Get a parameter from the function and run the expression to
+        # generate it's code
+        funcParam = []
+        for item in expr[0][1][1]:
+            if item[1]==",":
+                runExpr(funcParam) # run expr
+                funcParam = []
+            else:
+                funcParam.append(item)
+            print(item)
+
+        runExpr(funcParam) # run expr
+        # exit()
+        print(expr[0][1])
+        text("call "+expr[0][1][0][1]+" 1")
         return
 
 
@@ -145,6 +161,10 @@ def expressionToCode(expr):
 
 import copy
 def orderExpr(exprType):
+    ''' Obtains a list of tokens which comprise an expression '''
+
+
+
     # print("\n\n")
     if exprType in ["if","while"]:
         ending = "{"
@@ -164,6 +184,7 @@ def orderExpr(exprType):
 
 
         expr.append(token)
+        print(">>>>>>>",token)
 
 
         # Insure matching number of parenthesis
@@ -179,10 +200,25 @@ def orderExpr(exprType):
         token = lexer.peekNextToken()
         # Check if next token implies the current token is a function call
         if lastToken[0]=="id" and token[1]=="(":
+            lexer.getNextToken() # consume token
             expr[-1][0]="function"
+            expr[-1][1] = [expr[-1].copy(), []] # store function with arguments
+            bCount = 1
+            while bCount:   # Exit on obtaining all parameters
+                token = lexer.getNextToken()
+                if token[1]=="(":
+                    bCount+=1
+                elif token[1]==")":
+                    bCount-=1
+
+                if bCount:
+                    expr[-1][1][1].append(token)
+                    print(">>>>>>>",token)
+
+            token = lexer.peekNextToken() # Revert peek
 
         # Check if next token implies the current token is array
-        if token[1]=="[":
+        elif token[1]=="[":
             lexer.getNextToken() # consume token
             expr[-1][1] = [expr[-1].copy(), lexer.getNextToken()] # store array with index
             expr[-1][0]="array"
@@ -192,9 +228,12 @@ def orderExpr(exprType):
             token = lexer.peekNextToken() # Revert peek
 
     print(expr, bracketOpenCount)
+    return runExpr(expr)
 
 
 
+def runExpr(expr):
+    ''' Generates code for a given expression '''
 
     # Discern sub between neg and overwrite token
     neg = 1 # While true convert all '-' to 'neg'
