@@ -83,15 +83,17 @@ def function(token): # function int mult
 
 
 objectName = ""
+functionCounter = 0
 def setObjectName():
     # Check function has appropriate type and name
     token = lexer.getNextToken()
     if token[0] != "id":
         Error(token, "'id' expected")
 
-    global objectName
+    global objectName,functionCounter
     objectName = token[1]
-    text("function "+className+"."+objectName+" 1")
+    text("function "+className+"."+objectName+" "+str(functionCounter))
+    functionCounter+=1
 
 
 
@@ -308,13 +310,15 @@ def do(token):
 def If(token):
     token = lexer.getNextToken()
 
-    newLabel()
-    text("label "+labelStack[-1][0])    # While
+    newLabel("if")
+    # text("label "+labelStack[-1][0])    # If
     orderExpr("if")                     # (Generate expression code)
 
     # Go to end of statement if condition is false 
-    text("not")
-    text("if-goto "+labelStack[-1][0])  # {
+    # text("not")
+    text("if-goto IF_TRUE"+labelStack[-1][0])  # {
+    text("goto IF_FALSE"+labelStack[-1][0])  # {
+    text("label IF_TRUE"+labelStack[-1][0])  # {
 
     return [1]
 
@@ -331,7 +335,7 @@ def Else(token):
 
 
 def While(token):
-    newLabel()
+    newLabel("while")
     
     text("label "+labelStack[-1][0])   
     orderExpr("while")                      # Generate expression code
@@ -415,9 +419,16 @@ def symbol(token):
             # Check stack to detect closing of if or while loop
             for item in labelStack:
                 if item[1]==bracketPointer[0]:
-                    text("goto "+item[0])
-                    text(item[0]+" end")
-                    labelStack.pop()
+
+                    # Check type
+                    if item[2] == "while":
+                        text("goto "+item[0])
+                        text(item[0]+" end")
+                        labelStack.pop()
+                    elif item[2] == "if":
+                        text("label IF_FALSE"+item[0])
+
+
 
     if token[1]=="(":
         bracketPointer[1]+=1

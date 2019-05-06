@@ -355,20 +355,18 @@ def runExpr(expr):
 bracketPointer = [1, 1, 1]
 labelCounter = 0    # Increment counter as new labels are created
 labelStack = []     # Close loops as they are created
-def newLabel():
+def newLabel(labelType):
     global labelCounter
+
+    if labelType=="if":
+        labelStack.append([str(labelCounter), bracketPointer[0], labelType]) # Store label name, scope, type (if or while)
+    else:
+        labelStack.append(["l"+str(labelCounter), bracketPointer[0], labelType]) # Store label name, scope, type (if or while)
+
     labelCounter+=1
-    labelStack.append(["l"+str(labelCounter), bracketPointer[0]]) # Store label name and scope
     
 
 
-
-# orderExpr([['operator', '~', 4], ['symbol', '(', 4], ['id', 'x', 4], ['symbol', '=', 4], ['symbol', '(', 4], ['number', '0', 4], ['operator', '+', 4], ['number', '1', 4], ['symbol', ')', 4], ['symbol', ')', 4]])
-# orderExpr([['operator', '~', 4], ['symbol', '(', 4],  ['id', 'x', 4],['id', '-', 4],['id', 'x', 4], ['symbol', '=', 4], ['symbol', '-', 4], ['symbol', '(', 4], ['number', '0', 4], ['operator', '+', 4], ['number', '1', 4], ['symbol', ')', 4], ['symbol', ')', 4]])
-
-# print(orderExpr([['operator', '~', 4], ['symbol', '(', 4], ['id', 'x', 4], ['symbol', '=', 4], ['symbol', '(', 4], ['number', '0', 4], ['operator', '+', 4], ['symbol', '(', 4], ['number', '1', 4], ['operator', '*', 4], ['number', '5', 4], ['symbol', ')', 4], ['symbol', ')', 4], ['operator', '+', 4], ['symbol', '(', 4], ['number', '4', 4], ['operator', '*', 4], ['number', '6', 4], ['symbol', ')', 4], ['symbol', ')', 4]]))
-# print("\n\n")
-# print(output)
 
 
 
@@ -386,86 +384,4 @@ temp:         - used to access an 8 location segment for storing temporary value
 const:        - used to push a constant value into the stack.
 
 
-
-
-
-
-
-
-function int mult (int x, int y) {
-    var int result;
-    let result = 0;
-    while ~(x = 0) {
-        let result = result + y;
-        let x = x - 1;
-    }
-    return result;
-}
-
-
-
-function mult 1           // function int mult
-    push constant 0       // var int result;
-    pop local 0           // 
-label loop                // while
-    push argument 0       // x
-    push constant 0       // 0
-    eq                    // =
-    if-goto end           // 
-    push argument 1       // 
-    push local 0          // 
-    add                   // 
-    pop local 0           // 
-    push argument 0       // 
-    push constant 1       // 
-    sub                   // 
-    pop argument 0        // 
-    goto loop             // 
-label end                 // }
-
-    push local 0          // return result
-    return                // 
-
-
-
-
-
-
-
-
-// Declaring a var doesn't generate code
-// It simply adds some entries to the symbol table
-var int length;         // simply add a local variable to the table of local variables for this fucntion
-var int i, sum;         // This line doens't generate any code as well.
-
-let length = 12;
-let i = 0;
-let sum = 0;
-while (i < length){
-    let sum = sum + i;
-    let i = i + 1;
-}
-
-
-push constant 12
-pop local 0
-
-push constant 0
-pop local 1
-
-push constant 0
-pop local 2
-
-push local 1
-push local 0
-it
-
-
-
-
 '''
-
-
-
-
-
