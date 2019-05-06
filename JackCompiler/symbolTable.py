@@ -9,6 +9,7 @@ symbolTable = [[],    [],        [],        []]
 symbolIndexList = [[],[]]
 def addSymbol(*args,**kwargs):
 
+
     # Add new type to list of indexes as encountered
     if not kwargs.get("type",0) in symbolIndexList[0]:
         symbolIndexList[0].append(kwargs.get("type",0)) 
@@ -28,9 +29,14 @@ def addSymbol(*args,**kwargs):
         functionStack[1].append(0)
 
 
+    print("             symbolIndexList: ",symbolIndexList)
 
 
-
+def resetSymbolIndexList():
+    print("\n\n\n")
+    global symbolIndexList
+    print(symbolIndexList)
+    symbolIndexList = [[],[]]
 
 
 
@@ -40,10 +46,14 @@ def pushPop(token):
         return ["constant", token[1]]
     else:
         # Get data for popping    
-        symbolIndex = symbolTable[1].index(token[1])
-        varIndex = symbolTable[2][symbolIndex]
-        varType  = symbolTable[0][symbolIndex]
-        return [varType, varIndex]
+        if token[1] in symbolTable[1]:
+            symbolIndex = symbolTable[1].index(token[1])
+            varIndex = symbolTable[2][symbolIndex]
+            varType  = symbolTable[0][symbolIndex]
+            return [varType, varIndex]
+        else:
+            Error(token,"use of undeclared variable")
+            exit()
 
 def operatorToCode(token):
     # ["+","-","*","/","&","|","~","<",">"]
@@ -95,7 +105,7 @@ def expressionToCode(expr):
         return
 
     elif expr[0][0] in ["function"]:
-        print("\n\n\n\n",expr)
+
 
         # Get a parameter from the function and run the expression to
         # generate it's code
@@ -106,11 +116,11 @@ def expressionToCode(expr):
                 funcParam = []
             else:
                 funcParam.append(item)
-            print(item)
+
 
         runExpr(funcParam) # run expr
         # exit()
-        print(expr[0][1])
+
         text("call "+expr[0][1][0][1]+" 1")
         return
 
@@ -165,7 +175,7 @@ def orderExpr(exprType):
 
 
 
-    # print("\n\n")
+
     if exprType in ["if","while"]:
         ending = "{"
     elif exprType in ["let","do"]:
@@ -184,7 +194,7 @@ def orderExpr(exprType):
 
 
         expr.append(token)
-        print(">>>>>>>",token)
+        # print(">>>>>>>",token)
 
 
         # Insure matching number of parenthesis
@@ -213,7 +223,7 @@ def orderExpr(exprType):
 
                 if bCount:
                     expr[-1][1][1].append(token)
-                    print(">>>>>>>",token)
+                    # print(">>>>>>>",token)
 
             token = lexer.peekNextToken() # Revert peek
 
@@ -287,7 +297,7 @@ def runExpr(expr):
             if counter>=curPos:     # Shift pos back if item removal will cause shifts
                 pos-=1
 
-    print(result)
+
     for item in removeStack:
         result.remove(item)
 
@@ -308,15 +318,14 @@ def runExpr(expr):
 
 
     while len(result):
-        print()
-        print(pos,len(result)-1)
-        print(result[pos],depth)
+
+
 
 
         if pos==len(result)-1 or result[pos+1][1]<=depth:
 
             # Generate code in order of expressions 
-            print("     >",result[pos])
+            # print("     >",result[pos])
             expressionToCode(result[pos][0])
             result.remove(result[pos])
 

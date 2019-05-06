@@ -12,7 +12,7 @@ tokenStack = []
 className = ""
 def Class(token):
     token = lexer.getNextToken()
-    print(">>>>",token)
+
 
     if token[0]!="id":
         return [0, "'id' expected"]
@@ -26,35 +26,78 @@ def Class(token):
     return [1]
 
 
-def constructor(token):
-    return [1]
 
-    return [0, "'' expected"]
 
-def method(token):
-    return [1]
+objectType = ""
+def constructor(token):     # Check function is of correct type
+    global objectType
+    objectType = "constructor"
 
-    return [0, "'' expected"]
+    token = lexer.getNextToken()
+    if not token[1] == className:
+        return [0, "unexpected function type"]
 
+    setObjectName()
+    text("push constant "+str(constructorPushConstant))
+
+    # Alloc memory
+    text("call Memory.alloc 1")
+    text("pop pointer 0")
+
+    return setObjectArgs()
+
+
+def method(token):          # Check method is of correct type
+    global objectType
+    objectType = "method"
+
+    token = lexer.getNextToken()
+    if not token[1] in ["int", "boolean", "char", "void", className]: # Class name can be used in constructors
+        return [0, "unexpected method type"]
+    if token[0] != "keyword":
+        return [0, "'keyword' expected"]
+
+
+    setObjectName()
+
+    # Push argument
+    text("push argument 0")
+    text("pop pointer 0")
+
+    return setObjectArgs()
 
 
 def function(token): # function int mult
+    global objectType
+    objectType = "function"
 
-    # Check function is of proper type
+    # Check function is of correct type
     token = lexer.getNextToken()
     if not token[1] in ["int", "boolean", "char", "void"]:
         return [0, "unexpected function type"]
     if token[0] != "keyword":
         return [0, "'keyword' expected"]
 
+    setObjectName()
+    return setObjectArgs()
 
+
+objectName = ""
+def setObjectName():
     # Check function has appropriate type and name
     token = lexer.getNextToken()
     if token[0] != "id":
-        return [0, "'id' expected"]
+        Error(token, "'id' expected")
 
-    text("function "+className+"."+token[1]+" 1")
+    global objectName
+    objectName = token[1]
+    text("function "+className+"."+objectName+" 1")
 
+
+
+def setObjectArgs():
+    
+    resetSymbolIndexList() # Reset symbolIndexList on creation of new object
 
     token = lexer.getNextToken()
     if token[1]!="(":
@@ -99,28 +142,23 @@ def function(token): # function int mult
     return [1]
 
 
-def int(token):
-    return [1]
 
-    return [0, "'' expected"]
+
+def int(token):
+    print("             ",lexer.peekNextToken())
+    return createVar(token)
 
 def boolean(token):
-    return [1]
-
-    return [0, "'' expected"]
+    print("             ",lexer.peekNextToken())
+    return createVar(token)
 
 def char(token):
-    return [1]
-
-    return [0, "'' expected"]
+    print("             ",lexer.peekNextToken())
+    return createVar(token)
 
 def void(token):
-    return [1]
-
-    return [0, "'' expected"]
-
-
-
+    print("             ",lexer.peekNextToken())
+    return createVar(token)
 
 
 
@@ -130,9 +168,15 @@ def var(token):
     if not token[1] in ["int", "boolean", "char", "void", "Array"]:
         return [0, "declared variable is of invalid type"]
 
+    return createVar(token)
+
+
+constructorPushConstant = 0
+def createVar(token):
 
     # Check syntax of variables and add them to the symbol table
     tokenSwitch = 1 # Switch between checking for id and symbol with each loop
+    
     while token[1]!=";":
         token = lexer.getNextToken()
 
@@ -141,7 +185,15 @@ def var(token):
                 if token[0]!="id":
                     return [0, "Syntax Error: Identifier expected"]
                 else:
-                    addSymbol(type="local", symbol=token[1], scope="")
+                    if objectType == "":
+                        addSymbol(type="this", symbol=token[1], scope=objectName)
+                    else:
+                        addSymbol(type="local", symbol=token[1], scope=objectName)
+
+                    if objectType == "":
+                        global constructorPushConstant
+                        constructorPushConstant+=1
+                        
                 tokenSwitch = 0
             else:        
                 if token[0]!="symbol" and token[1]!="," :
@@ -316,6 +368,9 @@ def Return(token):
         pushData = pushPop(token)                      # Push Result
         text("push "+pushData[0]+" "+str(pushData[1]))
 
+    elif token[1] == "this":
+        # text("pop this 0")
+        text("push pointer 0")
 
     else:
         return [0, "Syntax Error: Unexpected token of type '"+token[0]+"' cannot be returned."]

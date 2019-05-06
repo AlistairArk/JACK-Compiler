@@ -1,35 +1,29 @@
 // This file is part of www.nand2tetris.org
 // and the book "The Elements of Computing Systems"
 // by Nisan and Schocken, MIT Press.
-// File name: projects/12/MathTest/Main.jack
+// File name: projects/09/Fraction/Fraction.jack
 
-/** Test program for the OS Math class. */
-class Main {
+/** Represents the Fraction type and related operations. */
+class Fraction {
+   field int numerator, denominator;  // field = property = member variable.
+  
+   /** Constructs a (reduced) fraction from the given numerator and denominator. */
+   constructor Fraction new(int x, int y) {
+      let numerator = x;
+      let denominator = y;
+      // do reduce();   // reduces the fraction
+      return this;   // a constructor is expected to return a reference to the new object
+   }
 
-    /** Performs various mathematical operations, using calls to the Math class methods. */
-    function void main() {
-        var Array r;          // stores the test results;
-        
-        let r = 8000;
-    
-        let r[0] = 2 * 3;                  // 6
-        let r[1] = r[0] * (-30);           // 6 * (-30) = -180
-        let r[2] = r[1] * 100;             // (-180) * 100 = -18000
-        let r[3] = 1 * r[2];               // 1 * (-18000) = -18000
-        let r[4] = r[3] * 0;               // 0
-        
-        let r[5] = 9 / 3;                  // 3
-        let r[6] = (-18000) / 6;           // -3000
-        let r[7] = 32766 / (-32767);       // 0
-        
-        let r[8] = Math.sqrt(9);           // 3
-        let r[9] = Math.sqrt(32767);       // 181
-        
-        let r[10] = Math.min(345, 123);    // 123
-        let r[11] = Math.max(123, -345);   // 123
-        let r[12] = Math.abs(27);          // 27
-        let r[13] = Math.abs(-32767);      // 32767
-        
-        return;
-    }
+   // Reduces this fraction.
+   method void reduce() {
+      var int g;
+      let g = 2;
+      // if (g > 1) {
+      //    let numerator = numerator / g;
+      //    let denominator = denominator / g;
+      // }
+      return;
+   }
+
 }
