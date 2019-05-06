@@ -324,9 +324,14 @@ def let(token):
 
 
 def do(token):
+
+    returnData = orderExpr("do")
+    if not returnData[0]:
+        return returnData
+
     return [1]
 
-    return [0, "'' expected"]
+    # return [0, "'' expected"]
 
 def If(token):
     token = lexer.getNextToken()

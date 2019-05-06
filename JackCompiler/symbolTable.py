@@ -150,7 +150,7 @@ def orderExpr(exprType):
     # print("\n\n")
     if exprType in ["if","while"]:
         ending = "{"
-    elif exprType in ["let"]:
+    elif exprType in ["let","do"]:
         ending = ";"
 
     # Perform checks on the expression and wrap it up into a list
