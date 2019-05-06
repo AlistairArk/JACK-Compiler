@@ -278,14 +278,22 @@ def let(token):
 
         popData = pushPop(token)
 
-        exit()
-        # if lexer.getNextToken()[1]!="=":
-        #     return [0, "'=' expected"]
 
-        # returnData = orderExpr("let")
-        # if not returnData[0]:
-        #     return returnData
+        if lexer.getNextToken()[1]!="]":
+            return [0, "']' expected"]
+
+        if lexer.getNextToken()[1]!="=":
+            return [0, "'=' expected"]
+
+        returnData = orderExpr("let")
+        if not returnData[0]:
+            return returnData
         # text("pop "+popData[0]+" "+str(popData[1]))
+        text("pop temp 0")
+        text("pop pointer 1")
+        text("push temp 0")
+        text("pop that 0")
+        text("push constant 0")
 
     else:
         popData = pushPop(token)
@@ -362,8 +370,12 @@ def Return(token):
     token = lexer.getNextToken()
 
     if token[1]==";":
+        # No value to be returned, just push const 0
+        text("push constant 0")
         if lexer.peekNextToken()[1]!="}":
             return [0, "Semantic Error: Unreachable code"]
+        
+
 
     elif token[0] in ["id","number"]:                  # Validate token type
         '''

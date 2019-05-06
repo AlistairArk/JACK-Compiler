@@ -132,10 +132,19 @@ def consumeToken():
                 lexeme+=file[pos]
                 pos+=1
 
+        # if file[pos]=="[": # Check if is array
+        #     lexeme = [lexeme,""]
+        #     while file[pos]!="]":
+        #         lexeme[1]+=file[pos]
+        #         pos+=1
+
+        #     return ["id",lexeme,lineNum]
+        # else:
 
         if lexeme in tokens[tokenType.index("keyword")]:
             return ["keyword",lexeme,lineNum]
         else:
+
             return ["id",lexeme,lineNum]
 
 

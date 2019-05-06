@@ -115,8 +115,27 @@ def expressionToCode(expr):
         else:            
             exprSwitch = 1
 
-            pushData = pushPop(token)
-            text("push "+pushData[0]+" "+str(pushData[1]))
+            if token[0]=="array":
+                print("ahhh\n\n\n")
+                print(token)
+
+                for item in [token[1][0],token[1][1],["operator","+",token[2]]]:
+                    print([item])
+                    expressionToCode([item])
+                '''
+                push local 2
+                push local 0
+                add
+
+                pop pointer 1
+                push that 0
+                '''
+                text("pop pointer 1")
+                text("push that 0")
+                # exit()
+            else:
+                pushData = pushPop(token)
+                text("push "+pushData[0]+" "+str(pushData[1]))
 
             if pos>1:
                 # if operator!="neg":
@@ -142,6 +161,7 @@ def orderExpr(exprType):
     while token[1]!=ending:
         
         token = lexer.getNextToken()    # Consume token
+        print("<><><><>",token)
         if token[0] == "EOF":
             return [0, "unexpected EOF, ')' expected"]
 
@@ -158,10 +178,20 @@ def orderExpr(exprType):
         if bracketOpenCount==-1:
             return [0, "mismatched number of parenthesis"]
         
-        # Check if next token implies the current token is a function call
         token = lexer.peekNextToken()
+        # Check if next token implies the current token is a function call
         if token[1]=="(":
             expr[-1][0]="function"
+        # Check if next token implies the current token is array
+        if token[1]=="[":
+            lexer.getNextToken() # consume token
+            print("<><><><>Z",token)
+            expr[-1][1] = [expr[-1].copy(), lexer.getNextToken()] # store array with index
+            expr[-1][0]="array"
+            if lexer.getNextToken()[1]!="]":
+                return [0, "']' expected"]
+
+            token = lexer.peekNextToken() # Revert peek
 
     print(expr, bracketOpenCount)
 
