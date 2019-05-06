@@ -83,7 +83,7 @@ def expressionToCode(expr):
     # Check what type the expression starts with
     if expr[0][0] == "operator":
         exprSwitch=1
-    elif expr[0][0] in ["id","number"]:
+    elif expr[0][0] in ["id","number","array"]:
         exprSwitch=0
 
     elif expr[0][0] in ["string_literal"]:
@@ -175,10 +175,12 @@ def orderExpr(exprType):
         if bracketOpenCount==-1:
             return [0, "mismatched number of parenthesis"]
         
+        lastToken = token
         token = lexer.peekNextToken()
         # Check if next token implies the current token is a function call
-        if token[1]=="(":
+        if lastToken[0]=="id" and token[1]=="(":
             expr[-1][0]="function"
+
         # Check if next token implies the current token is array
         if token[1]=="[":
             lexer.getNextToken() # consume token
@@ -189,7 +191,7 @@ def orderExpr(exprType):
 
             token = lexer.peekNextToken() # Revert peek
 
-    # print(expr, bracketOpenCount)
+    print(expr, bracketOpenCount)
 
 
 
@@ -237,11 +239,16 @@ def orderExpr(exprType):
 
     # Remove empty lists
     removeStack = []
+    counter = 0
+    curPos = pos
     for item in result:
+        counter+=1
         if item[0]==[]:
             removeStack.append(item)
+            if counter>=curPos:     # Shift pos back if item removal will cause shifts
+                pos-=1
 
-
+    print(result)
     for item in removeStack:
         result.remove(item)
 
@@ -259,11 +266,18 @@ def orderExpr(exprType):
             depth = result[count][1]
             pos = count
 
+
+
     while len(result):
+        print()
+        print(pos,len(result)-1)
+        print(result[pos],depth)
+
+
         if pos==len(result)-1 or result[pos+1][1]<=depth:
 
             # Generate code in order of expressions 
-            # print("     >",result[pos])
+            print("     >",result[pos])
             expressionToCode(result[pos][0])
             result.remove(result[pos])
 
