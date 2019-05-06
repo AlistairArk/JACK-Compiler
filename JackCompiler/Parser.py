@@ -45,9 +45,11 @@ def parseFile():
         token = lexer.getNextToken()
         print(token)
 
-    print("\n===== ===== ===== ===== ===== ===== ===== =====\n")
-    print(codeGen.output)
-    f = open("source.vm", "a")
+    # print("\n===== ===== ===== ===== ===== ===== ===== =====\n")
+    # print(codeGen.output)
+
+    # File Creation
+    f = open("source.vm", "w")
     f.write(codeGen.output)
     f.close()
 

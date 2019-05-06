@@ -76,10 +76,10 @@ def operatorToCode(token):
 
 
 def expressionToCode(expr):
-    # print("> ",expr)
+
     exprLen = len(expr)    # Get the length of the expression
 
-    print(expr)
+
     # Check what type the expression starts with
     if expr[0][0] == "operator":
         exprSwitch=1
@@ -105,7 +105,7 @@ def expressionToCode(expr):
         pos+=1
         if exprSwitch:
             exprSwitch = 0
-            print
+
             if token[0] != "operator":
                 return [0, "Syntax Error: Invalid type in expression. 'operator' expected"]
             operator=token
@@ -116,11 +116,9 @@ def expressionToCode(expr):
             exprSwitch = 1
 
             if token[0]=="array":
-                print("ahhh\n\n\n")
-                print(token)
+
 
                 for item in [token[1][0],token[1][1],["operator","+",token[2]]]:
-                    print([item])
                     expressionToCode([item])
                 '''
                 push local 2
@@ -161,7 +159,6 @@ def orderExpr(exprType):
     while token[1]!=ending:
         
         token = lexer.getNextToken()    # Consume token
-        print("<><><><>",token)
         if token[0] == "EOF":
             return [0, "unexpected EOF, ')' expected"]
 
@@ -185,7 +182,6 @@ def orderExpr(exprType):
         # Check if next token implies the current token is array
         if token[1]=="[":
             lexer.getNextToken() # consume token
-            print("<><><><>Z",token)
             expr[-1][1] = [expr[-1].copy(), lexer.getNextToken()] # store array with index
             expr[-1][0]="array"
             if lexer.getNextToken()[1]!="]":
@@ -193,7 +189,7 @@ def orderExpr(exprType):
 
             token = lexer.peekNextToken() # Revert peek
 
-    print(expr, bracketOpenCount)
+    # print(expr, bracketOpenCount)
 
 
 

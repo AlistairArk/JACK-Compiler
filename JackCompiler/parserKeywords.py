@@ -9,11 +9,22 @@ tokenStack = []
 
 
 
-
+className = ""
 def Class(token):
+    token = lexer.getNextToken()
+    print(">>>>",token)
+
+    if token[0]!="id":
+        return [0, "'id' expected"]
+    else:
+        global className
+        className = token[1]
+
+    if lexer.peekNextToken()[1]!="{":
+        return [0, "'{' expected"]
+
     return [1]
 
-    return [0, "'' expected"]
 
 def constructor(token):
     return [1]
@@ -42,7 +53,7 @@ def function(token): # function int mult
     if token[0] != "id":
         return [0, "'id' expected"]
 
-    text("function "+token[1]+" 1")
+    text("function "+className+"."+token[1]+" 1")
 
 
     token = lexer.getNextToken()
@@ -59,7 +70,7 @@ def function(token): # function int mult
         expectedTypePointer = 0
         while token[1]!=")":
             token = lexer.getNextToken()
-            print(token)
+
             
             if token[0]!=expectedTypeList[expectedTypePointer]:
                 return [0, "'"+expectedTypeList[expectedTypePointer]+"' expected"]
@@ -141,67 +152,6 @@ def var(token):
     return [1]
 
 
-    # expr = []               # Stores list of tokens in expression
-    # while token[1]!=";":    # Create a list of tokens which comprise the expression
-    #     expr.append(token)
-    #     token = lexer.getNextToken()
-
-    # if len(expr) == 1:
-    #     text("push constant "+str(expr[0][1]))
-
-
-    # expr = []               # Stores list of tokens in expression
-    # while token[1]!=";":    # Create a list of tokens which comprise the expression
-    #     expr.append(token)
-    #     token = lexer.getNextToken()
-
-    # if len(expr) == 1:
-    #     text("push constant "+str(expr[0][1]))
-    # else: # Handle expression
-
-    #     '''
-    #     # First check expression has correct syntax
-        
-    #     expectedTypePointer  - Handel's switching between operator and id/number
-    #     expressionCounter    - Counts number of operands encountered.
-    #                            After encountering 2 the operator is handled and the counter is reset.
-    #     '''
-    #     expectedTypePointer = 0 
-    #     expressionCounter = 0   
-    #     operator = []
-    #     for token in expr:
-    #         if expectedTypePointer:
-    #             if token[0] != "operator":
-    #                 return [0, "Syntax Error: Invalid type in expression. 'operator' expected"]
-    #             expectedTypePointer = 0
-    #             operator=token
-
-    #         else:
-                
-    #             if not token[0] in ["id","number"]:
-    #                 if token[0] == "operator" and token[1] == "-":
-    #                     expressionCounter = 1
-    #                     operator = "neg"
-    #                 else:
-    #                     return [0, "Syntax Error: Invalid type in expression. 'id' or 'number' expected"]
-    #             else:
-    #                 expectedTypePointer = 1
-    #                 expressionCounter+=1
-
-    #                 pushData = pushPop(token)
-    #                 text("push "+pushData[0]+" "+str(pushData[1]))
-    
-    #                 if expressionCounter>=2:
-    #                     # expressionCounter = 0
-    #                     if operator!="neg":
-    #                         operatorToCode(operator)
-    #                     else:
-    #                         text("neg")
-
-
-    #     if not expectedTypePointer:
-    #         return [0, "Syntax Error: Expression ends in 'operator'. 'id' or 'number' expected"]
-
 
 
 
@@ -226,37 +176,8 @@ def field(token):
 
 
 
-'''
-function Main.main 4
-
-"How many numbers? "
-
-push constant 18                        call String.new 1
-push constant 72                        call String.appendChar 2
-push constant 111                       call String.appendChar 2
-push constant 119                       call String.appendChar 2
-push constant 32                        call String.appendChar 2
-push constant 109                       call String.appendChar 2
-push constant 97                        call String.appendChar 2
-push constant 110                       call String.appendChar 2
-push constant 121                       call String.appendChar 2
-push constant 32                        call String.appendChar 2
-push constant 110                       call String.appendChar 2
-push constant 117                       call String.appendChar 2
-push constant 109                       call String.appendChar 2
-push constant 98                        call String.appendChar 2
-push constant 101                       call String.appendChar 2
-push constant 114                       call String.appendChar 2
-push constant 115                       call String.appendChar 2
-push constant 63                        call String.appendChar 2
-push constant 32                        call String.appendChar 2
 
 
-call Keyboard.readInt 1                 pop local 1
-push constant 0
-return
-
-'''
 
 
 def let(token):
@@ -265,15 +186,13 @@ def let(token):
     if token[0]!="id":
         return [0, "'id' expected"]
 
-    print("\n\n")
-    print(">>>>>>>>>",token)
-    # print(symbolTable)
-    # exit()
+
+
     if lexer.peekNextToken()[1]=="[": # Check if array
         lexer.getNextToken() # consume token
 
         for item in [lexer.getNextToken(),token,["operator","+",token[2]]]:
-            print([item])
+
             expressionToCode([item])
 
         popData = pushPop(token)
@@ -293,7 +212,7 @@ def let(token):
         text("pop pointer 1")
         text("push temp 0")
         text("pop that 0")
-        text("push constant 0")
+        # text("push constant 0")
 
     else:
         popData = pushPop(token)
@@ -326,6 +245,7 @@ def let(token):
 def do(token):
 
     returnData = orderExpr("do")
+    text("pop temp 0")
     if not returnData[0]:
         return returnData
 
@@ -339,6 +259,9 @@ def If(token):
     newLabel()
     text("label "+labelStack[-1][0])    # While
     orderExpr("if")                     # (Generate expression code)
+
+    # Go to end of statement if condition is false 
+    text("not")
     text("if-goto "+labelStack[-1][0])  # {
 
     return [1]
@@ -360,6 +283,9 @@ def While(token):
     
     text("label "+labelStack[-1][0])   
     orderExpr("while")                      # Generate expression code
+
+    # Go to end of loop if condition is false 
+    text("not")
     text("if-goto "+labelStack[-1][0])
 
     return [1]
