@@ -9,22 +9,28 @@ symbolTable = [[],    [],    [],    [],     []]
 symbolIndexList = [[],[]]
 def addSymbol(*args,**kwargs):
 
+    symbolType = kwargs.get("type",0)
+    # Check context the symbol is being mentioned in 
+    if objectName == "":                            # if referenced from static context
+        if kwargs.get("attribute",0)=="static":     # if declared as static
+            symbolType="static"
+
 
     # Add new type to list of indexes as encountered
-    if not kwargs.get("type",0) in symbolIndexList[0]:
-        symbolIndexList[0].append(kwargs.get("type",0)) 
+    if not symbolType in symbolIndexList[0]:
+        symbolIndexList[0].append(symbolType) 
         symbolIndexList[1].append(-1)
 
-    symbolIndex = symbolIndexList[0].index(kwargs.get("type",0))
+    symbolIndex = symbolIndexList[0].index(symbolType)
     symbolIndexList[1][symbolIndex] += 1 # Incriment index
 
-    symbolTable[0].append(kwargs.get("type",0))
+    symbolTable[0].append(symbolType)
     symbolTable[1].append(kwargs.get("symbol",0))
     symbolTable[2].append(kwargs.get("index",symbolIndexList[1][symbolIndex]))
     symbolTable[3].append(objectName) # scope            # kwargs.get("scope",0))
     symbolTable[4].append(kwargs.get("attribute",0))
 
-    if kwargs.get("type",0) in ["function","class"]: # if function or class add to function stack
+    if symbolType in ["function","class"]: # if function or class add to function stack
         global semicolon
         functionStack[0].append(kwargs.get("symbol",0))
         functionStack[1].append(0)
@@ -53,6 +59,12 @@ def pushPop(token):
             symbolIndex = symbolTable[1].index(token[1])
             varIndex = symbolTable[2][symbolIndex]
             varType  = symbolTable[0][symbolIndex]
+
+            # # Check context the symbol is being mentioned in 
+            # if symbolTable[3][symbolIndex] == "":           # if static context
+            #     if symbolTable[4][symbolIndex]=="static":   # if declared as static
+
+
             return [varType, varIndex]
         else:
             # print(symbolTable)
@@ -159,6 +171,8 @@ def expressionToCode(expr):
             else:
  
                 pushData = pushPop(token)
+                print("\n\n\n")
+                print(symbolTable)
                 text("push "+pushData[0]+" "+str(pushData[1]))
 
             if pos>1:
@@ -226,7 +240,7 @@ def exprFunctionRunParam(funcParam):
 
 def exprFunctionHandler(expr):
 
-    # print("\n\n\n")
+
 
     # Get num of args (to be used when calling the function)
     if expr[1][1]==[]:
@@ -360,7 +374,7 @@ def orderExpr(exprType):
 
             token = lexer.peekNextToken() # Revert peek
 
-    print("<><><><><><><>", expr, bracketOpenCount)
+    # print("<><><><><><><>", expr, bracketOpenCount)
 
     return runExpr(expr)
 
@@ -369,7 +383,7 @@ def orderExpr(exprType):
 def runExpr(expr):
     ''' Generates code for a given expression '''
 
-    print("\n\n")
+
 
 
     '''

@@ -96,7 +96,9 @@ def setObjectName():
     if token[0] != "id":
         Error(token, "'id' expected")
 
+    # Reset counter and set new name on entry to new object
     symbolTable.objectName = token[1]
+    symbolTablelabelCounter = [0,0,0]
 
     # Get number of declared variables in function
     while (token[1]!="{"): # loop to start of function
@@ -481,7 +483,7 @@ def symbol(token):
                         symbolTable.labelStack.pop()
                     elif item[2] == "if":
                         symbolTable.labelStack.pop()
-                        
+
                         peekToken = lexer.peekNextToken()
                         if peekToken[1]=="else":
                             symbolTable.newLabel("else") 
