@@ -380,16 +380,15 @@ def Else(token):
 
 
 
-
 def While(token):
     symbolTable.newLabel("while")
     
-    text("label "+symbolTable.labelStack[-1][0])   
+    text("label WHILE_EXP"+symbolTable.labelStack[-1][0])   
     symbolTable.orderExpr("while")                      # Generate expression code
 
     # Go to end of loop if condition is false 
     text("not")
-    text("if-goto "+symbolTable.labelStack[-1][0])
+    text("if-goto WHILE_END"+symbolTable.labelStack[-1][0])
 
     return [1]
 
@@ -477,8 +476,8 @@ def symbol(token):
 
                     # Check type
                     if item[2] == "while":
-                        text("goto "+item[0])
-                        text(item[0]+" end")
+                        text("goto WHILE_EXP"+item[0])
+                        text("label WHILE_END"+item[0])
                         symbolTable.labelStack.pop()
                     elif item[2] == "if":
                         text("label IF_FALSE"+item[0])

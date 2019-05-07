@@ -491,17 +491,19 @@ def runExpr(expr):
 
 #                 {  (  [
 bracketPointer = [1, 1, 1]
-labelCounter = 0    # Increment counter as new labels are created
-labelStack = []     # Close loops as they are created
+#                 if, while
+labelCounter   = [0 ,  0]  # Increment counter as new labels are created
+labelStack = []       # Close loops as they are created
 def newLabel(labelType):
     global labelCounter
 
     if labelType=="if":
-        labelStack.append([str(labelCounter), bracketPointer[0], labelType]) # Store label name, scope, type (if or while)
-    else:
-        labelStack.append(["l"+str(labelCounter), bracketPointer[0], labelType]) # Store label name, scope, type (if or while)
+        labelStack.append([str(labelCounter[0]), bracketPointer[0], labelType]) # Store label name, scope, type (if or while)
+        labelCounter[0]+=1
+    elif labelType=="while":
+        labelStack.append([str(labelCounter[1]), bracketPointer[0], labelType]) # Store label name, scope, type (if or while)
+        labelCounter[1]+=1
 
-    labelCounter+=1
     
 
 
