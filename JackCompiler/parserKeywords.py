@@ -35,7 +35,8 @@ def constructor(token):     # Check function is of correct type
 
     token = lexer.getNextToken()
     if not token[1] == symbolTable.className:
-        return [0, "unexpected function type"]
+        return [0, "Invalid method declaration of type "+str(token[1])]
+        # return [0, "unexpected function type"]
 
     attribute = token[1]
 
@@ -54,10 +55,10 @@ def method(token):          # Check method is of correct type
     objectType = "method"
 
     token = lexer.getNextToken()
-    if not token[1] in ["int", "boolean", "char", "void", symbolTable.className]: # Class name can be used in constructors
-        return [0, "unexpected method type"]
-    if token[0] != "keyword":
-        return [0, "'keyword' expected"]
+    if not token[1] in ["int", "boolean", "char", "void", symbolTable.className] and token[0] != "keyword": # Class name can be used in constructors
+        return [0, "Invalid method declaration of type "+str(token[1])]
+    # if token[0] != "keyword":
+    #     print(symbolTable.className)
 
     attribute = token[1]
 
@@ -66,6 +67,8 @@ def method(token):          # Check method is of correct type
     # Push argument
     text("push argument 0")
     text("pop pointer 0")
+
+    # exit()
 
     return setObjectArgs(attribute)
 
@@ -76,10 +79,8 @@ def function(token): # function int mult
 
     # Check function is of correct type
     token = lexer.getNextToken()
-    if not token[1] in ["int", "boolean", "char", "void"]:
-        return [0, "unexpected function type"]
-    if token[0] != "keyword":
-        return [0, "'keyword' expected"]
+    if not token[1] in ["int", "boolean", "char", "void", symbolTable.className] and token[0] != "keyword": # Class name can be used in constructors
+        return [0, "Invalid method declaration of type "+str(token[1])]
 
     attribute = token[1]
 
@@ -88,17 +89,60 @@ def function(token): # function int mult
 
 
 objectName = ""
-functionCounter = 0
+# functionCounter = 0
 def setObjectName():
     # Check function has appropriate type and name
     token = lexer.getNextToken()
     if token[0] != "id":
         Error(token, "'id' expected")
 
-    global objectName,functionCounter
+    global objectName
     objectName = token[1]
-    text("function "+symbolTable.className+"."+objectName+" "+str(functionCounter))
-    functionCounter+=1
+
+    # Get number of declared variables in function
+    while (token[1]!="{"): # loop to start of function
+        token = lexer.peekNextToken()
+        eof(token)
+
+    # Loop to end of the function
+    # Incriment variable counter each time one is encountered
+    bCount=1
+    varCount=0
+    while bCount:
+        token = lexer.peekNextToken()
+        # print(token)
+        if token[1] == "var":
+            token = lexer.peekNextToken() # Consume data type
+
+            # Check syntax of variables and add them to the symbol table
+            tokenSwitch = 1 # Switch between checking for id and symbol with each loop
+            while token[1]!=";":
+                token = lexer.peekNextToken()
+                # print(token)
+                if token[1]!=";":
+                    if tokenSwitch:
+                        if token[0]!="id":
+                            Error(token,"Syntax Error: Identifier expected")
+                        else:
+                            varCount+=1
+                        tokenSwitch = 0
+                    else:        
+                        if token[0]!="symbol" and token[1]!="," :
+                            Error(token,"Syntax Error: Symbol expected")
+                        else:
+                            tokenSwitch = 1
+                eof(token)
+
+        if token[1]=="{":
+            bCount+=1
+        elif token[1]=="}":
+            bCount-=1
+
+        eof(token)
+
+    text("function "+symbolTable.className+"."+objectName+" "+str(varCount))
+
+    # functionCounter+=1
 
     # Add retroactive call list 
 
@@ -117,23 +161,25 @@ def setObjectArgs(attribute):
 
     else:
         ## Check syntax of function arguments
-        expectedTypeList = ["keyword","id","symbol"]
+        expectedTypeList = [["keyword","id"],["id"],["symbol"]]
         expectedTypePointer = 0
         while token[1]!=")":
             token = lexer.getNextToken()
 
             
-            if token[0]!=expectedTypeList[expectedTypePointer]:
-                return [0, "'"+expectedTypeList[expectedTypePointer]+"' expected"]
+            if token[0] not in expectedTypeList[expectedTypePointer]:
+                exit()
+                return [0, "'"+expectedTypeList[expectedTypePointer][0]+"' expected"]
             
-            elif token[0] == "keyword":
-                if not token[1] in ["int", "boolean", "char"]: 
-                    return [0, "unexpected keyword type"]
+            elif expectedTypePointer == 0:
+                pass
+                # if not token[1] in ["int", "boolean", "char"]: 
+                #     return [0, "unexpected keyword type"]
             
-            elif token[0] == "id": # add variable to symbol table
+            elif expectedTypePointer == 1: # add variable to symbol table
                     symbolTable.addSymbol(type="argument",attribute=attribute, symbol=token[1], scope="")
 
-            elif token[0] == "symbol":
+            elif expectedTypePointer == 2:
                 if not token[1] in [",", ")"]: 
                     return [0, "unexpected symbol type"]
 
@@ -153,20 +199,32 @@ def setObjectArgs(attribute):
 
 
 def int(token):
-    print("             ",lexer.peekNextToken())
-    return createVar(token)
+    lexer.getNextToken()
+    return createVar(token,"int")
 
 def boolean(token):
-    print("             ",lexer.peekNextToken())
-    return createVar(token)
+    lexer.getNextToken()
+    return createVar(token,"boolean")
 
 def char(token):
-    print("             ",lexer.peekNextToken())
-    return createVar(token)
+    lexer.getNextToken()
+    return createVar(token,"char")
 
 def void(token):
-    print("             ",lexer.peekNextToken())
-    return createVar(token)
+    lexer.getNextToken()
+    return createVar(token,"void")
+
+def static(token):
+    lexer.getNextToken()
+    return createVar(token,"static")
+
+def field(token):
+    lexer.getNextToken()
+    return createVar(token,"field")
+
+
+
+
 
 
 
@@ -216,21 +274,6 @@ def createVar(token, attribute):
 
 
 
-
-
-
-
-
-
-def static(token):
-    return [1]
-
-    return [0, "'' expected"]
-
-def field(token):
-    return [1]
-
-    return [0, "'' expected"]
 
 
 
@@ -358,9 +401,10 @@ def While(token):
 
 def Return(token):
 
-    token = lexer.getNextToken()
+    token = lexer.peekNextToken()
 
     if token[1]==";":
+        lexer.getNextToken() # consume the token
         # No value to be returned, just push const 0
         text("push constant 0")
         if lexer.peekNextToken()[1]!="}":
@@ -368,13 +412,20 @@ def Return(token):
         
 
 
-    elif token[0] in ["id","number"]:                  # Validate token type
+    elif token[0] in ["id","number"]: # or token[1] in ["this"]:                  # Validate token type
         '''
         This section may require further tweaking to make 
         returning multiple values possible.
         '''
-        pushData = symbolTable.pushPop(token)                      # Push Result
-        text("push "+pushData[0]+" "+str(pushData[1]))
+
+        ## Simply returns a given identifier - note this requires modificaton to return expressions
+        # pushData = symbolTable.pushPop(token)                      # Push Result
+        # text("push "+pushData[0]+" "+str(pushData[1]))
+
+        # Return expression
+        returnData = symbolTable.orderExpr("return")
+        if not returnData[0]:
+            return returnData
 
     elif token[1] == "this":
         # text("pop this 0")
@@ -431,6 +482,7 @@ def symbol(token):
                         symbolTable.labelStack.pop()
                     elif item[2] == "if":
                         text("label IF_FALSE"+item[0])
+                        symbolTable.labelStack.pop()
 
 
 

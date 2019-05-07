@@ -12,3 +12,11 @@ Use Example:
 '''
 def Error(*args):
     print("Error in line " + str(args[0][2]) + " at or near " + str(args[0][1])+ ", " + str(args[1]));
+    exit()
+
+
+def eof(token):
+    ''' Quick EOF check'''
+
+    if token[0] == "EOF":
+        print("unexpected EOF")
