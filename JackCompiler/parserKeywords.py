@@ -98,7 +98,7 @@ def setObjectName():
 
     # Reset counter and set new name on entry to new object
     symbolTable.objectName = token[1]
-    symbolTablelabelCounter = [0,0,0]
+    symbolTable.labelCounter = [0,0,0]
 
     # Get number of declared variables in function
     while (token[1]!="{"): # loop to start of function
@@ -200,28 +200,34 @@ def setObjectArgs(attribute):
 
 
 def int(token):
-    lexer.getNextToken()
-    return createVar(token,"int")
+    token = lexer.getNextToken()
+    attribute = token[1]
+    return createVar(token,attribute,"int")
 
 def boolean(token):
-    lexer.getNextToken()
-    return createVar(token,"boolean")
+    token = lexer.getNextToken()
+    attribute = token[1]
+    return createVar(token,attribute,"boolean")
 
 def char(token):
-    lexer.getNextToken()
-    return createVar(token,"char")
+    token = lexer.getNextToken()
+    attribute = token[1]
+    return createVar(token,attribute,"char")
 
 def void(token):
-    lexer.getNextToken()
-    return createVar(token,"void")
+    token = lexer.getNextToken()
+    attribute = token[1]
+    return createVar(token,attribute,"void")
 
 def static(token):
-    lexer.getNextToken()
-    return createVar(token,"static")
+    token = lexer.getNextToken()
+    attribute = token[1]
+    return createVar(token,attribute,"static")
 
 def field(token):
-    lexer.getNextToken()
-    return createVar(token,"field")
+    token = lexer.getNextToken()
+    attribute = token[1]
+    return createVar(token,attribute,"field")
 
 
 
@@ -237,11 +243,11 @@ def var(token):
         return [0, "declared variable is of invalid type"]
     attribute = token[1]
 
-    return createVar(token, attribute)
+    return createVar(token, attribute, 0)
 
 
 constructorPushConstant = 0
-def createVar(token, attribute):
+def createVar(token, attribute, context):
 
     # Check syntax of variables and add them to the symbol table
     tokenSwitch = 1 # Switch between checking for id and symbol with each loop
@@ -254,8 +260,10 @@ def createVar(token, attribute):
                 if token[0]!="id":
                     return [0, "Syntax Error: Identifier expected"]
                 else:
-                    if objectType == "":
-                        symbolTable.addSymbol(type="this", attribute=attribute, symbol=token[1], scope=symbolTable.objectName)
+                    # print("     ",token, attribute,objectType)
+                    # exit()
+                    if objectType == "": # If refrenced from static context
+                        symbolTable.addSymbol(type=context, attribute=attribute, symbol=token[1], scope=symbolTable.objectName)
                     else:
                         symbolTable.addSymbol(type="local", attribute=attribute, symbol=token[1], scope=symbolTable.objectName)
 

@@ -10,10 +10,14 @@ symbolIndexList = [[],[]]
 def addSymbol(*args,**kwargs):
 
     symbolType = kwargs.get("type",0)
-    # Check context the symbol is being mentioned in 
-    if objectName == "":                            # if referenced from static context
-        if kwargs.get("attribute",0)=="static":     # if declared as static
-            symbolType="static"
+    # # Check context the symbol is being mentioned in 
+    # if objectName == "":                            # if referenced from static context
+    #     if kwargs.get("attribute",0)=="static":     # if declared as static
+    #         symbolType="static"
+
+    #     else:
+    #         symbolType="static"
+
 
 
     # Add new type to list of indexes as encountered
@@ -60,10 +64,13 @@ def pushPop(token):
             varIndex = symbolTable[2][symbolIndex]
             varType  = symbolTable[0][symbolIndex]
 
+            
+            if varType not in ["static", "argument", "local", "this", "that", "pointer", "temp", "const"]:
+                varType = "this"
+
             # # Check context the symbol is being mentioned in 
             # if symbolTable[3][symbolIndex] == "":           # if static context
             #     if symbolTable[4][symbolIndex]=="static":   # if declared as static
-
 
             return [varType, varIndex]
         else:
@@ -283,15 +290,20 @@ def exprFunctionHandler(expr):
                 # argCount+=1
 
                 pushData = pushPop([expr[1][0][0],callSplit[0],expr[1][0][2]])
-                text("push "+pushData[0]+" "+str(pushData[1] + 1))                  # <<< DOUBLE CHECK + 1 IS RIGHT
+                text("push "+pushData[0]+" "+str(pushData[1]))                  # <<< DOUBLE CHECK + 1 IS RIGHT
 
 
 
+                    
                 if len(callSplit)==2:
                     text("call "+symbolTable[4][i]+"."+callSplit[1]+" "+str(argCount+1))# <<< DOUBLE CHECK + 1 IS RIGHT
                 else:
                     text("call "+symbolTable[4][i]+" "+str(argCount+1))
 
+                if symbolTable[4][i]=="field":
+                    print("pushData: ",pushData)
+                    print(callSplit)
+                    exit()
                 # if (symbolTable[4][i]+"."+callSplit[1]) == "Fraction.getNumerator":
                 #     exit()
                 return
