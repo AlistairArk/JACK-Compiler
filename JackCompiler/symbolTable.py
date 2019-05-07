@@ -376,19 +376,25 @@ def runExpr(expr):
     lastBracketOpen = 0
     while counter!=len(expr):# Loop through expression. 
   
-        # if '/' encountered bracket LHS items so they take precedent
-        if expr[counter][1]=="/" and expr[counter][0]=="operator":
+        # if '/' or '-' encountered bracket LHS items so they take precedent
+        if expr[counter][0]=="operator":
+            if (expr[counter][1]=="/" or expr[counter][1]=="-"):
 
-            expr.insert( counter, ['symbol', ')', expr[counter][0]])
-            expr.insert( lastBracketOpen, ['symbol', '(', expr[lastBracketOpen][0]])
+                expr.insert( counter, ['symbol', ')', expr[counter][0]])
+                expr.insert( counter, ['symbol', ')', expr[counter][0]])
+                expr.insert( lastBracketOpen, ['symbol', '(', expr[lastBracketOpen][0]])
+                expr.insert( lastBracketOpen, ['symbol', '(', expr[lastBracketOpen][0]])
 
-            counter+=2
+                counter+=4
         elif expr[counter][1]=="(":
             lastBracketOpen=counter
 
         counter+=1
 
+    # May want to add a later pass that does a LHS to RHS sweep and gives RHS an arbitrarily high depth if '-' or '/' are encountered
 
+    # print("\n\n\n",expr)
+    # exit()
 
 
 
