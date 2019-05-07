@@ -1,5 +1,5 @@
-import lexer
-from symbolTable import *
+import lexer, symbolTable
+# from symbolTable import *
 from codeGen import *
 
 tokenStack = []
@@ -9,7 +9,7 @@ tokenStack = []
 
 
 
-className = ""
+
 def Class(token):
     token = lexer.getNextToken()
 
@@ -17,8 +17,8 @@ def Class(token):
     if token[0]!="id":
         return [0, "'id' expected"]
     else:
-        global className
-        className = token[1]
+
+        symbolTable.className = token[1]
 
     if lexer.peekNextToken()[1]!="{":
         return [0, "'{' expected"]
@@ -34,7 +34,7 @@ def constructor(token):     # Check function is of correct type
     objectType = "constructor"
 
     token = lexer.getNextToken()
-    if not token[1] == className:
+    if not token[1] == symbolTable.className:
         return [0, "unexpected function type"]
 
     setObjectName()
@@ -52,7 +52,7 @@ def method(token):          # Check method is of correct type
     objectType = "method"
 
     token = lexer.getNextToken()
-    if not token[1] in ["int", "boolean", "char", "void", className]: # Class name can be used in constructors
+    if not token[1] in ["int", "boolean", "char", "void", symbolTable.className]: # Class name can be used in constructors
         return [0, "unexpected method type"]
     if token[0] != "keyword":
         return [0, "'keyword' expected"]
@@ -92,14 +92,15 @@ def setObjectName():
 
     global objectName,functionCounter
     objectName = token[1]
-    text("function "+className+"."+objectName+" "+str(functionCounter))
+    text("function "+symbolTable.className+"."+objectName+" "+str(functionCounter))
     functionCounter+=1
 
+    # Add retroactive call list 
 
 
 def setObjectArgs():
     
-    resetSymbolIndexList() # Reset symbolIndexList on creation of new object
+    symbolTable.resetSymbolIndexList() # Reset symbolIndexList on creation of new object
 
     token = lexer.getNextToken()
     if token[1]!="(":
@@ -125,7 +126,7 @@ def setObjectArgs():
                     return [0, "unexpected keyword type"]
             
             elif token[0] == "id": # add variable to symbol table
-                    addSymbol(type="argument", symbol=token[1], scope="")
+                    symbolTable.addSymbol(type="argument", symbol=token[1], scope="")
 
             elif token[0] == "symbol":
                 if not token[1] in [",", ")"]: 
@@ -188,9 +189,9 @@ def createVar(token):
                     return [0, "Syntax Error: Identifier expected"]
                 else:
                     if objectType == "":
-                        addSymbol(type="this", symbol=token[1], scope=objectName)
+                        symbolTable.addSymbol(type="this", symbol=token[1], scope=objectName)
                     else:
-                        addSymbol(type="local", symbol=token[1], scope=objectName)
+                        symbolTable.addSymbol(type="local", symbol=token[1], scope=objectName)
 
                     if objectType == "":
                         global constructorPushConstant
@@ -247,9 +248,9 @@ def let(token):
 
         for item in [lexer.getNextToken(),token,["operator","+",token[2]]]:
 
-            expressionToCode([item])
+            symbolTable.expressionToCode([item])
 
-        popData = pushPop(token)
+        popData = symbolTable.pushPop(token)
 
 
         if lexer.getNextToken()[1]!="]":
@@ -258,7 +259,7 @@ def let(token):
         if lexer.getNextToken()[1]!="=":
             return [0, "'=' expected"]
 
-        returnData = orderExpr("let")
+        returnData = symbolTable.orderExpr("let")
         if not returnData[0]:
             return returnData
         # text("pop "+popData[0]+" "+str(popData[1]))
@@ -269,12 +270,12 @@ def let(token):
         # text("push constant 0")
 
     else:
-        popData = pushPop(token)
+        popData = symbolTable.pushPop(token)
 
         if lexer.getNextToken()[1]!="=":
             return [0, "'=' expected"]
 
-        returnData = orderExpr("let")
+        returnData = symbolTable.orderExpr("let")
         if not returnData[0]:
             return returnData
         text("pop "+popData[0]+" "+str(popData[1]))
@@ -298,27 +299,23 @@ def let(token):
 
 def do(token):
 
-    returnData = orderExpr("do")
+    returnData = symbolTable.orderExpr("do")
     text("pop temp 0")
     if not returnData[0]:
         return returnData
 
     return [1]
 
-    # return [0, "'' expected"]
+
 
 def If(token):
-    token = lexer.getNextToken()
 
-    newLabel("if")
-    # text("label "+labelStack[-1][0])    # If
-    orderExpr("if")                     # (Generate expression code)
+    symbolTable.newLabel("if")                      
+    symbolTable.orderExpr("if")                     # (Generate expression code)
 
-    # Go to end of statement if condition is false 
-    # text("not")
-    text("if-goto IF_TRUE"+labelStack[-1][0])  # {
-    text("goto IF_FALSE"+labelStack[-1][0])  # {
-    text("label IF_TRUE"+labelStack[-1][0])  # {
+    text("if-goto IF_TRUE"+symbolTable.labelStack[-1][0])
+    text("goto IF_FALSE"+symbolTable.labelStack[-1][0])
+    text("label IF_TRUE"+symbolTable.labelStack[-1][0])
 
     return [1]
 
@@ -335,14 +332,14 @@ def Else(token):
 
 
 def While(token):
-    newLabel("while")
+    symbolTable.newLabel("while")
     
-    text("label "+labelStack[-1][0])   
-    orderExpr("while")                      # Generate expression code
+    text("label "+symbolTable.labelStack[-1][0])   
+    symbolTable.orderExpr("while")                      # Generate expression code
 
     # Go to end of loop if condition is false 
     text("not")
-    text("if-goto "+labelStack[-1][0])
+    text("if-goto "+symbolTable.labelStack[-1][0])
 
     return [1]
 
@@ -369,7 +366,7 @@ def Return(token):
         This section may require further tweaking to make 
         returning multiple values possible.
         '''
-        pushData = pushPop(token)                      # Push Result
+        pushData = symbolTable.pushPop(token)                      # Push Result
         text("push "+pushData[0]+" "+str(pushData[1]))
 
     elif token[1] == "this":
@@ -410,38 +407,38 @@ def this(token):
 def symbol(token):
 
     if token[1]=="{":
-        bracketPointer[0]+=1
+        symbolTable.bracketPointer[0]+=1
     if token[1]=="}":
-        bracketPointer[0]-=1
-        if not bracketPointer[0]:
+        symbolTable.bracketPointer[0]-=1
+        if not symbolTable.bracketPointer[0]:
             return [0, "Semantic Error: mismatched number of braces"]
         else:
             # Check stack to detect closing of if or while loop
-            for item in labelStack:
-                if item[1]==bracketPointer[0]:
+            for item in symbolTable.labelStack:
+                if item[1]==symbolTable.bracketPointer[0]:
 
                     # Check type
                     if item[2] == "while":
                         text("goto "+item[0])
                         text(item[0]+" end")
-                        labelStack.pop()
+                        symbolTable.labelStack.pop()
                     elif item[2] == "if":
                         text("label IF_FALSE"+item[0])
 
 
 
     if token[1]=="(":
-        bracketPointer[1]+=1
+        symbolTable.bracketPointer[1]+=1
     if token[1]==")":
-        bracketPointer[1]-=1
-        if not bracketPointer[1]:
+        symbolTable.bracketPointer[1]-=1
+        if not symbolTable.bracketPointer[1]:
             return [0, "Semantic Error: mismatched number of parenthesis"]
 
     if token[1]=="[":
-        bracketPointer[2]+=1
+        symbolTable.bracketPointer[2]+=1
     if token[1]=="]":
-        bracketPointer[2]-=1
-        if not bracketPointer[2]:
+        symbolTable.bracketPointer[2]-=1
+        if not symbolTable.bracketPointer[2]:
             return [0, "Semantic Error: mismatched number of square brackets"]
 
 

@@ -33,9 +33,6 @@ def addSymbol(*args,**kwargs):
 
 
 def resetSymbolIndexList():
-    print("\n\n\n")
-    global symbolIndexList
-    print(symbolIndexList)
     symbolIndexList = [[],[]]
 
 
@@ -84,7 +81,8 @@ def operatorToCode(token):
         text("call Math.divide 2")
 
 
-
+methodList = []
+className = ""
 def expressionToCode(expr):
 
     exprLen = len(expr)    # Get the length of the expression
@@ -106,22 +104,35 @@ def expressionToCode(expr):
 
     elif expr[0][0] in ["function"]:
 
+        # Get num of args (to be used when calling the function)
+        if expr[0][1][1]==[]:
+            argCount = 0
+        else:
+            argCount = 1
 
-        # Get a parameter from the function and run the expression to
-        # generate it's code
+        # Get a parameter from the function and run the expression to generate it's code
         funcParam = []
         for item in expr[0][1][1]:
             if item[1]==",":
                 runExpr(funcParam) # run expr
                 funcParam = []
+                argCount+=1
             else:
                 funcParam.append(item)
 
 
         runExpr(funcParam) # run expr
-        # exit()
 
-        text("call "+expr[0][1][0][1]+" 1")
+    
+        # Check if method exists in current file      
+        if expr[0][1][0][1] in methodList:
+            global className
+            text("push pointer 0 ")
+            text("call "+className+"."+expr[0][1][0][1]+" "+str(argCount))
+        else:
+            # Assume method exists as lib or external function
+            text("call "+expr[0][1][0][1]+" "+str(argCount))
+
         return
 
 
@@ -245,6 +256,35 @@ def orderExpr(exprType):
 def runExpr(expr):
     ''' Generates code for a given expression '''
 
+
+
+
+    '''
+    # Check for divisions
+    The following will ensure expressions RHS of a '/' take president
+    over the LHS as the order of code generation is important 
+    '''
+    counter = 0
+    lastBracketOpen = 0
+    while counter!=len(expr):# Loop through expression. 
+  
+        # if '/' encountered bracket LHS items so they take precedent
+        if expr[counter][1]=="/":
+            print("loop back")
+
+            expr.insert( counter, ['symbol', ')', expr[counter][0]])
+            expr.insert( lastBracketOpen, ['symbol', '(', expr[lastBracketOpen][0]])
+
+            counter+=2
+        elif expr[counter][1]=="(":
+            lastBracketOpen=counter
+
+        counter+=1
+
+
+
+
+
     # Discern sub between neg and overwrite token
     neg = 1 # While true convert all '-' to 'neg'
     for i in range(len(expr)):
@@ -255,7 +295,7 @@ def runExpr(expr):
         elif expr[i][0] in ["id","number"]:     # Disable neg if number
             neg = 0
 
-        elif expr[i][1] == "=":                 # Enable neg if equal
+        elif expr[i][1] in lexer.operators:      # Enable neg if operator is encountered         # == "=":  # Enable neg if equal
             neg = 1
 
 
@@ -267,7 +307,6 @@ def runExpr(expr):
     Calculates depth of parenthesized expressions 
     in order to handle them in the correct order. 
     '''
-
     result = [[[],0]]
     depth = 0
     pos = 0
@@ -316,11 +355,8 @@ def runExpr(expr):
             pos = count
 
 
-
+    print(result)
     while len(result):
-
-
-
 
         if pos==len(result)-1 or result[pos+1][1]<=depth:
 

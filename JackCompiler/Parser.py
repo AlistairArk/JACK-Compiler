@@ -7,7 +7,7 @@ The program does not crash or become unstable if the source file contains any ki
 Both the lexer and parser have been tested using the provided JACK source files and are shown to function properly without any issues. 
 '''
 
-import lexer, parserKeywords, codeGen
+import lexer, parserKeywords, codeGen, symbolTable
 
 '''
 note:
@@ -39,6 +39,19 @@ def OK(token):
 
 def parseFile():
 
+    '''
+    Generate a list of methods to later be used in function calls
+    '''
+    token = lexer.peekNextToken()
+    while (token[0] != "EOF"):
+        if token[1]=="method":
+            lexer.peekNextToken() # consume
+            symbolTable.methodList.append(lexer.peekNextToken()[1])
+        token = lexer.peekNextToken()
+
+
+
+    # Begin main parsing of file
     token = lexer.getNextToken()
     while (token[0] != "EOF"):
         stmt(token)
