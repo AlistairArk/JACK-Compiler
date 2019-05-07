@@ -21,7 +21,7 @@ def addSymbol(*args,**kwargs):
     symbolTable[0].append(kwargs.get("type",0))
     symbolTable[1].append(kwargs.get("symbol",0))
     symbolTable[2].append(kwargs.get("index",symbolIndexList[1][symbolIndex]))
-    symbolTable[3].append(kwargs.get("scope",0))
+    symbolTable[3].append(objectName) # scope            # kwargs.get("scope",0))
     symbolTable[4].append(kwargs.get("attribute",0))
 
     if kwargs.get("type",0) in ["function","class"]: # if function or class add to function stack
@@ -40,6 +40,11 @@ def resetSymbolIndexList():
 
 
 def pushPop(token):
+    # print("\n\n\n",token, symbolTable)
+    # print(className)
+    # print(objectName)
+    # print()
+
     if token[0]=="number":
         return ["constant", token[1]]
     else:
@@ -85,6 +90,7 @@ def operatorToCode(token):
 
 methodList = []
 className = ""
+objectName = ""
 def expressionToCode(expr):
 
     exprLen = len(expr)    # Get the length of the expression
@@ -223,7 +229,7 @@ def exprFunctionHandler(expr):
     else:
         argCount = 1
 
-    print("\n\n",expr, argCount)
+    # print("\n\n",expr, argCount)
 
     # Get a parameter from the function and run the expression to generate it's code
     funcParam = []
@@ -232,7 +238,7 @@ def exprFunctionHandler(expr):
             exprFunctionRunParam(funcParam) # run expr
             funcParam = []
             argCount+=1
-            print(funcParam)
+            # print(funcParam)
         else:
             funcParam.append(item)
 
@@ -372,7 +378,6 @@ def runExpr(expr):
   
         # if '/' encountered bracket LHS items so they take precedent
         if expr[counter][1]=="/" and expr[counter][0]=="operator":
-            print("loop back")
 
             expr.insert( counter, ['symbol', ')', expr[counter][0]])
             expr.insert( lastBracketOpen, ['symbol', '(', expr[lastBracketOpen][0]])

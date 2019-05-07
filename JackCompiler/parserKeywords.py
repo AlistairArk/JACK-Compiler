@@ -88,7 +88,7 @@ def function(token): # function int mult
     return setObjectArgs(attribute)
 
 
-objectName = ""
+
 # functionCounter = 0
 def setObjectName():
     # Check function has appropriate type and name
@@ -96,8 +96,7 @@ def setObjectName():
     if token[0] != "id":
         Error(token, "'id' expected")
 
-    global objectName
-    objectName = token[1]
+    symbolTable.objectName = token[1]
 
     # Get number of declared variables in function
     while (token[1]!="{"): # loop to start of function
@@ -140,7 +139,7 @@ def setObjectName():
 
         eof(token)
 
-    text("function "+symbolTable.className+"."+objectName+" "+str(varCount))
+    text("function "+symbolTable.className+"."+symbolTable.objectName+" "+str(varCount))
 
     # functionCounter+=1
 
@@ -149,7 +148,7 @@ def setObjectName():
 
 def setObjectArgs(attribute):
     
-    symbolTable.resetSymbolIndexList() # Reset symbolIndexList on creation of new object
+    symbolTable.symbolIndexList = [[],[]] # Reset symbolIndexList on creation of new object
 
     token = lexer.getNextToken()
     if token[1]!="(":
@@ -254,9 +253,9 @@ def createVar(token, attribute):
                     return [0, "Syntax Error: Identifier expected"]
                 else:
                     if objectType == "":
-                        symbolTable.addSymbol(type="this", attribute=attribute, symbol=token[1], scope=objectName)
+                        symbolTable.addSymbol(type="this", attribute=attribute, symbol=token[1], scope=symbolTable.objectName)
                     else:
-                        symbolTable.addSymbol(type="local", attribute=attribute, symbol=token[1], scope=objectName)
+                        symbolTable.addSymbol(type="local", attribute=attribute, symbol=token[1], scope=symbolTable.objectName)
 
                     if objectType == "":
                         global constructorPushConstant
