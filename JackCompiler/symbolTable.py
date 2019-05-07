@@ -364,7 +364,7 @@ def orderExpr(exprType):
 def runExpr(expr):
     ''' Generates code for a given expression '''
 
-
+    print("\n\n")
 
 
     '''
@@ -446,10 +446,9 @@ def runExpr(expr):
         counter+=1
         if item[0]==[]:
             removeStack.append(item)
-            if counter>=curPos:     # Shift pos back if item removal will cause shifts
+            if counter>=curPos:     # Shift pos back if item removal will cause shifts (MAY BE UNNECCESARY BECAUSE OF LATER CHECK)
                 pos-=1
 
-    # print(result,pos)
 
     for item in removeStack:
         result.remove(item)
@@ -459,18 +458,19 @@ def runExpr(expr):
     # Get order of bracketed expressions
     exprOrder = []
     depth = 0
+    print(pos)
 
     # Check for starting potential depths
     count = -1
     for item in result:
         count+=1
-        if result[count][1]>depth:
+        if result[count][1]>=depth:
             depth = result[count][1]
             pos = count
 
 
     while len(result):
-
+        print(pos,result)
         if pos==len(result)-1 or result[pos+1][1]<=depth:
 
             # Generate code in order of expressions 
