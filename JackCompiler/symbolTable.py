@@ -3,8 +3,8 @@ from codeGen import *
 
 
 
-#             type, symbol, index, scope
-symbolTable = [[],    [],        [],        []]
+#             type, symbol, index, scope, attribute (data type)
+symbolTable = [[],    [],    [],    [],     []]
 
 symbolIndexList = [[],[]]
 def addSymbol(*args,**kwargs):
@@ -22,6 +22,7 @@ def addSymbol(*args,**kwargs):
     symbolTable[1].append(kwargs.get("symbol",0))
     symbolTable[2].append(kwargs.get("index",symbolIndexList[1][symbolIndex]))
     symbolTable[3].append(kwargs.get("scope",0))
+    symbolTable[4].append(kwargs.get("attribute",0))
 
     if kwargs.get("type",0) in ["function","class"]: # if function or class add to function stack
         global semicolon
@@ -50,7 +51,7 @@ def pushPop(token):
             return [varType, varIndex]
         else:
             Error(token,"use of undeclared variable")
-            exit()
+
 
 def operatorToCode(token):
     # ["+","-","*","/","&","|","~","<",">"]
@@ -103,12 +104,15 @@ def expressionToCode(expr):
         return
 
     elif expr[0][0] in ["function"]:
+        print("\n\n\n")
 
         # Get num of args (to be used when calling the function)
         if expr[0][1][1]==[]:
             argCount = 0
         else:
             argCount = 1
+
+        print(expr[0][1][1], argCount)
 
         # Get a parameter from the function and run the expression to generate it's code
         funcParam = []
@@ -131,7 +135,30 @@ def expressionToCode(expr):
             text("call "+className+"."+expr[0][1][0][1]+" "+str(argCount))
         else:
             # Assume method exists as lib or external function
+
+            # print("\n\n\n")
+            # pushData = symbolTable.pushPop(token)                      # Push Result
+            # text("push "+pushData[0]+" "+str(pushData[1]))
+            callSplit = expr[0][1][0][1].split(".")
+            for i in range(len(symbolTable[0])):
+
+                # if calling an object, and object is in scope
+                if callSplit[0]==symbolTable[1][i]: # and callSplit[0]==symbolTable[3][i] :
+                    argCount+=1
+                    pushData = pushPop([expr[0][1][0][0],callSplit[0],expr[0][1][0][2]])
+                    text("push "+pushData[0]+" "+str(pushData[1]))
+
+                    if len(callSplit)==2:
+                        text("call "+symbolTable[4][i]+"."+callSplit[1]+" "+str(argCount))
+                    else:
+                        text("call "+symbolTable[4][i]+" "+str(argCount))
+
+                    return
+
+            # print(expr[0][1][0][1].split(".")[0])
+            # print(symbolTable)
             text("call "+expr[0][1][0][1]+" "+str(argCount))
+            # exit()
 
         return
 
@@ -169,6 +196,7 @@ def expressionToCode(expr):
                 text("push that 0")
                 # exit()
             else:
+                print("\n\n\n",token)
                 pushData = pushPop(token)
                 text("push "+pushData[0]+" "+str(pushData[1]))
 

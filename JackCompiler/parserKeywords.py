@@ -37,6 +37,8 @@ def constructor(token):     # Check function is of correct type
     if not token[1] == symbolTable.className:
         return [0, "unexpected function type"]
 
+    attribute = token[1]
+
     setObjectName()
     text("push constant "+str(constructorPushConstant))
 
@@ -44,7 +46,7 @@ def constructor(token):     # Check function is of correct type
     text("call Memory.alloc 1")
     text("pop pointer 0")
 
-    return setObjectArgs()
+    return setObjectArgs(attribute)
 
 
 def method(token):          # Check method is of correct type
@@ -57,6 +59,7 @@ def method(token):          # Check method is of correct type
     if token[0] != "keyword":
         return [0, "'keyword' expected"]
 
+    attribute = token[1]
 
     setObjectName()
 
@@ -64,7 +67,7 @@ def method(token):          # Check method is of correct type
     text("push argument 0")
     text("pop pointer 0")
 
-    return setObjectArgs()
+    return setObjectArgs(attribute)
 
 
 def function(token): # function int mult
@@ -78,8 +81,10 @@ def function(token): # function int mult
     if token[0] != "keyword":
         return [0, "'keyword' expected"]
 
+    attribute = token[1]
+
     setObjectName()
-    return setObjectArgs()
+    return setObjectArgs(attribute)
 
 
 objectName = ""
@@ -98,7 +103,7 @@ def setObjectName():
     # Add retroactive call list 
 
 
-def setObjectArgs():
+def setObjectArgs(attribute):
     
     symbolTable.resetSymbolIndexList() # Reset symbolIndexList on creation of new object
 
@@ -126,7 +131,7 @@ def setObjectArgs():
                     return [0, "unexpected keyword type"]
             
             elif token[0] == "id": # add variable to symbol table
-                    symbolTable.addSymbol(type="argument", symbol=token[1], scope="")
+                    symbolTable.addSymbol(type="argument",attribute=attribute, symbol=token[1], scope="")
 
             elif token[0] == "symbol":
                 if not token[1] in [",", ")"]: 
@@ -168,14 +173,16 @@ def void(token):
 
 def var(token):
     token = lexer.getNextToken()
-    if not token[1] in ["int", "boolean", "char", "void", "Array"]:
-        return [0, "declared variable is of invalid type"]
 
-    return createVar(token)
+    if not token[1] in ["int", "boolean", "char", "void", "Array"] and token[0]!="id":
+        return [0, "declared variable is of invalid type"]
+    attribute = token[1]
+
+    return createVar(token, attribute)
 
 
 constructorPushConstant = 0
-def createVar(token):
+def createVar(token, attribute):
 
     # Check syntax of variables and add them to the symbol table
     tokenSwitch = 1 # Switch between checking for id and symbol with each loop
@@ -189,9 +196,9 @@ def createVar(token):
                     return [0, "Syntax Error: Identifier expected"]
                 else:
                     if objectType == "":
-                        symbolTable.addSymbol(type="this", symbol=token[1], scope=objectName)
+                        symbolTable.addSymbol(type="this", attribute=attribute, symbol=token[1], scope=objectName)
                     else:
-                        symbolTable.addSymbol(type="local", symbol=token[1], scope=objectName)
+                        symbolTable.addSymbol(type="local", attribute=attribute, symbol=token[1], scope=objectName)
 
                     if objectType == "":
                         global constructorPushConstant
