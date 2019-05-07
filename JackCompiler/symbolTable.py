@@ -99,8 +99,6 @@ def expressionToCode(expr):
     # Check what type the expression starts with
     if expr[0][0] == "operator":
         exprSwitch=1
-    elif expr[0][0] in ["id","number","array","function"] or expr[0][1] in ["this"]:
-        exprSwitch=0
 
     elif expr[0][0] in ["string_literal"]:
         text("push constant "+str(len(expr[0][1])))         # Push length of string
@@ -110,6 +108,8 @@ def expressionToCode(expr):
             text("call String.appendChar 2")
         return
 
+    elif expr[0][0] in ["id","number","array","function"] or expr[0][1] in ["this","true","false"]:
+        exprSwitch=0
     
     # print(expr)
 
@@ -150,6 +150,11 @@ def expressionToCode(expr):
 
             elif token[1]=="this":
                 text("push pointer 0")
+
+            elif token[1] in ["true","false"]:
+                text("push constant 0")
+                if token[1]=="true":
+                    text("not")
 
             else:
  
@@ -355,7 +360,7 @@ def orderExpr(exprType):
 
             token = lexer.peekNextToken() # Revert peek
 
-    # print("<><><><><><><>", expr, bracketOpenCount)
+    print("<><><><><><><>", expr, bracketOpenCount)
 
     return runExpr(expr)
 
@@ -393,7 +398,6 @@ def runExpr(expr):
 
     # May want to add a later pass that does a LHS to RHS sweep and gives RHS an arbitrarily high depth if '-' or '/' are encountered
 
-    # print("\n\n\n",expr)
     # exit()
 
 
@@ -502,8 +506,8 @@ def runExpr(expr):
 
 #                 {  (  [
 bracketPointer = [1, 1, 1]
-#                 if, while
-labelCounter   = [0 ,  0]  # Increment counter as new labels are created
+#                 if, else, while
+labelCounter   = [ 0,    0,    0]  # Increment counter as new labels are created
 labelStack = []       # Close loops as they are created
 def newLabel(labelType):
     global labelCounter
@@ -511,9 +515,12 @@ def newLabel(labelType):
     if labelType=="if":
         labelStack.append([str(labelCounter[0]), bracketPointer[0], labelType]) # Store label name, scope, type (if or while)
         labelCounter[0]+=1
-    elif labelType=="while":
+    elif labelType=="else":
         labelStack.append([str(labelCounter[1]), bracketPointer[0], labelType]) # Store label name, scope, type (if or while)
         labelCounter[1]+=1
+    elif labelType=="while":
+        labelStack.append([str(labelCounter[2]), bracketPointer[0], labelType]) # Store label name, scope, type (if or while)
+        labelCounter[2]+=1
 
     
 

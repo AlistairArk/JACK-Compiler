@@ -371,10 +371,11 @@ def If(token):
 
 
 def Else(token):
-    if lexer.peekNextToken()[1]=="{":
-        return [1]
-    else:
+
+    if lexer.peekNextToken()[1]!="{":
         return [0, "'{' expected"]
+    
+    return [1]
 
 
 
@@ -479,10 +480,19 @@ def symbol(token):
                         text("label WHILE_END"+item[0])
                         symbolTable.labelStack.pop()
                     elif item[2] == "if":
-                        text("label IF_FALSE"+item[0])
                         symbolTable.labelStack.pop()
+                        
+                        peekToken = lexer.peekNextToken()
+                        if peekToken[1]=="else":
+                            symbolTable.newLabel("else") 
+                            text("goto IF_END"+symbolTable.labelStack[-1][0])
 
+                        text("label IF_FALSE"+item[0])
 
+                    elif item[2] == "else":
+
+                        text("label IF_END"+item[0])
+                        symbolTable.labelStack.pop()
 
     if token[1]=="(":
         symbolTable.bracketPointer[1]+=1
