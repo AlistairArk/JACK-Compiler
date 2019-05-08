@@ -53,7 +53,6 @@ def addSymbol(*args,**kwargs):
         functionStack[1].append(0)
 
 
-    # print("             symbolIndexList: ",symbolIndexList)
 
 
 def resetSymbolIndexList():
@@ -63,10 +62,7 @@ def resetSymbolIndexList():
 
 
 def pushPop(token):
-    # print("\n\n\n",token, symbolTable)
-    # print(className)
-    # print(objectName)
-    # print()
+
 
     if token[0]=="number":
         return ["constant", token[1]]
@@ -76,12 +72,11 @@ def pushPop(token):
 
             # Prioritize symbols declared within scope
             symbolFound = 0
-            print(token, symbolTable,objectName)
             for i in range(len(symbolTable[0])):
                 # if symbol found, and, symbol is in scope 
                 if symbolTable[1][i]==token[1] and symbolTable[3][i]==objectName:
                     symbolFound = 1
-                    print("found!!")
+                    # print("found!!")
                     varIndex = symbolTable[2][i]
                     varType  = symbolTable[0][i]
 
@@ -133,7 +128,7 @@ def operatorToCode(token):
         text("call Math.divide 2")
 
 
-
+arrayDepth = 0
 def expressionToCode(expr):
 
     exprLen = len(expr)    # Get the length of the expression
@@ -173,21 +168,17 @@ def expressionToCode(expr):
             exprSwitch = 1
 
             if token[0]=="array":
+                print("pass")
+                exprArrayHandler(token)
 
+                # for item in [token[1][0],token[1][1],["operator","+",token[2]]]:
+                #     expressionToCode([item])
+                global arrayDepth
+                if arrayDepth:
+                    text("pop pointer 1")
+                    text("push that 0")
 
-                for item in [token[1][0],token[1][1],["operator","+",token[2]]]:
-                    expressionToCode([item])
-                '''
-                push local 2
-                push local 0
-                add
-
-                pop pointer 1
-                push that 0
-                '''
-                text("pop pointer 1")
-                text("push that 0")
-                # exit()
+                print("fin")
             elif token[0]=="function":
                 exprFunctionHandler(token)
 
@@ -202,8 +193,6 @@ def expressionToCode(expr):
             else:
  
                 pushData = pushPop(token)
-                print("\n\n\n")
-                print("ahh")
                 text("push "+pushData[0]+" "+str(pushData[1]))
 
             if pos>1:
@@ -214,8 +203,7 @@ def expressionToCode(expr):
 
 
 def exprFunctionRunParam(funcParam):
-    # print("\n\n\n")
-    # print(funcParam)
+
     '''
     Every time this function is called, stacked functions and arrays must be identified before
     generating code for the expression.
@@ -226,7 +214,7 @@ def exprFunctionRunParam(funcParam):
     # While counter != number of parameter, and, there is more than one parameter
     while counter!=len(funcParam):
         expr.append(funcParam[counter])
-        # print(funcParam[counter])
+
         counter+=1
         if counter!=len(funcParam):
 
@@ -237,34 +225,32 @@ def exprFunctionRunParam(funcParam):
                 bCount = 1
                 while bCount: #and counter!=len(funcParam):   # Exit on obtaining all content in brackets 
                     counter+=1
-                    # print("~~",funcParam[counter],bCount )
+
                     if funcParam[counter][1]=="(":
                         bCount+=1
                     elif funcParam[counter][1]==")":
                         bCount-=1
 
                     if bCount:
-                        # print(expr)
                         expr[-1][1][1].append(funcParam[counter])
 
             # Check if next token implies the current token is array
-            elif funcParam[counter][1]=="[":
-                counter+=1  # consume token
-                expr[-1][1] = [expr[-1].copy(), funcParam[counter]] # store array with index
+            elif funcParam[counter-1][0]=="id" and funcParam[counter][1]=="[" and funcParam[counter][0]=="symbol":
                 expr[-1][0]="array"
-                counter+=1  # consume token
-                if funcParam[counter][1]!="]":
-                    return [0, "']' expected"]
-                else:
-                    counter+=1  # consume token
+                expr[-1][1] = [expr[-1].copy(), []] # store function with arguments
+                bCount = 1
+                while bCount: #and counter!=len(funcParam):   # Exit on obtaining all content in brackets 
+                    counter+=1
+
+                    if funcParam[counter][1]=="[":
+                        bCount+=1
+                    elif funcParam[counter][1]=="]":
+                        bCount-=1
+
+                    if bCount:
+                        expr[-1][1][1].append(funcParam[counter])
 
 
-
-
-    # if ['id', 'other.getDenominator', 16] in funcParam:
-    #     print(funcParam)
-    #     print(expr)
-    #     exit()
 
 
     runExpr(expr) # run expr
@@ -279,7 +265,6 @@ def exprFunctionHandler(expr):
         else:
             argCount = 1
 
-        # print("\n\n",expr, argCount)
 
         # Get a parameter from the function and run the expression to generate it's code
         funcParam = []
@@ -288,7 +273,6 @@ def exprFunctionHandler(expr):
                 exprFunctionRunParam(funcParam) # run expr
                 funcParam = []
                 argCount+=1
-                # print(funcParam)
             else:
                 funcParam.append(item)
 
@@ -301,8 +285,6 @@ def exprFunctionHandler(expr):
 
     # Check if method exists in current file      
     if expr[1][0][1] in methodList:
-        print("\n\n\n","waddup")
-        print(expr)
         global className
         text("push pointer 0 ")
         argCount = handleParams(expr)
@@ -320,7 +302,6 @@ def exprFunctionHandler(expr):
                 text("push "+pushData[0]+" "+str(pushData[1]))                  # <<< DOUBLE CHECK + 1 IS RIGHT
 
                 argCount = handleParams(expr)
-                print("\n\n",argCount)
                     
                 if len(callSplit)==2:
                     text("call "+symbolTable[4][i]+"."+callSplit[1]+" "+str(argCount+1))# <<< DOUBLE CHECK + 1 IS RIGHT
@@ -340,8 +321,84 @@ def exprFunctionHandler(expr):
 
         text("call "+expr[1][0][1]+" "+str(argCount))
 
-
     return
+
+
+def exprArrayHandler(expr):
+    global arrayDepth
+    arrayDepth+=1
+    print(expr)
+    # expr = []
+    counter = 0
+
+    exprFunctionRunParam(expr[1][1])
+    pushData = pushPop(expr[1][0])
+    text("push "+pushData[0]+" "+str(pushData[1]))
+    text("add")
+    text("")
+    arrayDepth-=1
+    return
+
+    # def handleParams(expr):
+    #     # Get num of args (to be used when calling the function)
+    #     if expr[1][1]==[]:
+    #         argCount = 0
+    #     else:
+    #         argCount = 1
+
+
+    #     # Get a parameter from the function and run the expression to generate it's code
+    #     funcParam = []
+    #     for item in expr[1][1]:
+    #         if item[1]==",":
+    #             exprFunctionRunParam(funcParam) # run expr
+    #             funcParam = []
+    #             argCount+=1
+    #         else:
+    #             funcParam.append(item)
+
+    #     exprFunctionRunParam(funcParam) # run final expr
+
+
+    #     return argCount
+
+
+
+    # # Check if method exists in current file      
+    # if expr[1][0][1] in methodList:
+    #     global className
+    #     text("push pointer 0 ")
+    #     argCount = handleParams(expr)
+    #     text("call "+className+"."+expr[1][0][1]+" "+str(argCount+1))
+    # else:
+    #     # Assume method exists as lib or external function
+    #     callSplit = expr[1][0][1].split(".")
+    #     for i in range(len(symbolTable[0])):
+
+    #         # if calling an object, and object is in scope
+    #         if callSplit[0]==symbolTable[1][i]: # and callSplit[0]==symbolTable[3][i] :
+    #             # argCount+=1
+
+    #             pushData = pushPop([expr[1][0][0],callSplit[0],expr[1][0][2]])
+    #             text("push "+pushData[0]+" "+str(pushData[1]))                  # <<< DOUBLE CHECK + 1 IS RIGHT
+
+    #             argCount = handleParams(expr)
+                    
+    #             if len(callSplit)==2:
+    #                 text("call "+symbolTable[4][i]+"."+callSplit[1]+" "+str(argCount+1))# <<< DOUBLE CHECK + 1 IS RIGHT
+    #             else:
+    #                 text("call "+symbolTable[4][i]+" "+str(argCount+1))
+
+    #             return
+
+
+    #     argCount = handleParams(expr)
+
+    #     text("call "+expr[1][0][1]+" "+str(argCount))
+
+
+
+
 
 
 def orderExpr(exprType):
@@ -405,12 +462,21 @@ def orderExpr(exprType):
             token = lexer.peekNextToken() # Revert peek
 
         # Check if next token implies the current token is array
-        elif token[1]=="[":
+        elif lastToken[0]=="id" and token[1]=="[":
             lexer.getNextToken() # consume token
-            expr[-1][1] = [expr[-1].copy(), lexer.getNextToken()] # store array with index
             expr[-1][0]="array"
-            if lexer.getNextToken()[1]!="]":
-                return [0, "']' expected"]
+            expr[-1][1] = [expr[-1].copy(), []] # store function with arguments
+            bCount = 1
+            while bCount:   # Exit on obtaining all parameters
+                token = lexer.getNextToken()
+                if token[1]=="[":
+                    bCount+=1
+                elif token[1]=="]":
+                    bCount-=1
+
+                if bCount:
+                    expr[-1][1][1].append(token)
+                    # print(">>>>>>>",token)
 
             token = lexer.peekNextToken() # Revert peek
 
@@ -452,7 +518,6 @@ def runExpr(expr):
 
     # May want to add a later pass that does a LHS to RHS sweep and gives RHS an arbitrarily high depth if '-' or '/' are encountered
 
-    # exit()
 
 
 
@@ -516,7 +581,6 @@ def runExpr(expr):
     # Get order of bracketed expressions
     exprOrder = []
     depth = 0
-    print(pos)
 
     # Check for starting potential depths
     count = -1
@@ -528,7 +592,7 @@ def runExpr(expr):
 
 
     while len(result):
-        print(pos,result)
+
         if pos==len(result)-1 or result[pos+1][1]<=depth:
 
             # Generate code in order of expressions 

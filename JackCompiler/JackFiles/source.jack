@@ -1,9 +1,0 @@
-function int mult (int x, int y) {
-    var int result;
-    let result = 0;
-    while ~(x = 0) {
-        let result = result + y;
-        let x = x - 1;
-    }
-    return result;
-}

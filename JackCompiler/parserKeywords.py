@@ -170,7 +170,7 @@ def setObjectArgs(attribute):
 
             
             if token[0] not in expectedTypeList[expectedTypePointer]:
-                exit()
+
                 return [0, "'"+expectedTypeList[expectedTypePointer][0]+"' expected"]
             
             elif expectedTypePointer == 0:
@@ -262,11 +262,11 @@ def createVar(token, attribute, context):
                     return [0, "Syntax Error: Identifier expected"]
                 else:
                     # print("     ",token, attribute,objectType)
-                    # exit()
+
                     if objectType == "": # If refrenced from static context
                         # global symbolTable.staticVarCount
                         # symbolTable.staticVarCount+=1
-                        print("             ", token, attribute, context, symbolTable.staticVarCount)
+                        # print("             ", token, attribute, context, symbolTable.staticVarCount)
                         symbolTable.addSymbol(type=context, attribute=attribute, symbol=token[1], scope=symbolTable.objectName)
                     else:
                         symbolTable.addSymbol(type="local", attribute=attribute, symbol=token[1], scope=symbolTable.objectName)
@@ -305,17 +305,41 @@ def let(token):
 
 
     if lexer.peekNextToken()[1]=="[": # Check if array
+        
+        expr = [token] # Stores list of tokens in expression
+
         lexer.getNextToken() # consume token
 
-        for item in [lexer.getNextToken(),token,["operator","+",token[2]]]:
+        expr[-1][0]="array"
+        expr[-1][1] = [expr[-1].copy(), []] # store function with arguments
+        bCount = 1
+        while bCount:   # Exit on obtaining all parameters
+            token = lexer.getNextToken()
+            print(token)
+            if token[1]=="[":
+                bCount+=1
+            elif token[1]=="]":
+                bCount-=1
 
-            symbolTable.expressionToCode([item])
+            if bCount:
+                expr[-1][1][1].append(token)
+                # print(">>>>>>>",token)
 
-        popData = symbolTable.pushPop(token)
+        token = lexer.peekNextToken() # Revert peek
+
+        print("\n\n")
+        print(expr)
+        symbolTable.expressionToCode(expr)
+
+        # for item in [lexer.getNextToken(),token,["operator","+",token[2]]]:
+
+        #     symbolTable.expressionToCode([item])
+
+        # popData = symbolTable.pushPop(token)
 
 
-        if lexer.getNextToken()[1]!="]":
-            return [0, "']' expected"]
+        # if lexer.getNextToken()[1]!="]":
+        #     return [0, "']' expected"]
 
         if lexer.getNextToken()[1]!="=":
             return [0, "'=' expected"]
@@ -323,12 +347,14 @@ def let(token):
         returnData = symbolTable.orderExpr("let")
         if not returnData[0]:
             return returnData
-        # text("pop "+popData[0]+" "+str(popData[1]))
+
+        print("here")
+
         text("pop temp 0")
         text("pop pointer 1")
         text("push temp 0")
         text("pop that 0")
-        # text("push constant 0")
+
 
     else:
         popData = symbolTable.pushPop(token)

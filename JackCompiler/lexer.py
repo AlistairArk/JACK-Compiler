@@ -12,8 +12,8 @@ properly without any issues.
 
 
 # # file = list(shlex.shlex(open("source.jack", "r").read())) # Loads the test file
-file = open("tall.jack", "r").read()+" " # Loads the test file
-fileLen = len(file)
+file = 0            # open("tall.jack", "r").read()+" " # Loads the test file
+fileLen = 0         # len(file)
 pos = -1
 lineNum = 1
 peekFlag = 0

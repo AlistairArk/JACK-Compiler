@@ -51,12 +51,11 @@ def main(args):
         if file.endswith(".jack"):
             # print(os.path.join(args[0], file), file)
 
-            print(args[0]+"\\"+os.path.splitext(file)[0]+".vm")
+            print("\n",args[0]+"\\"+os.path.splitext(file)[0]+".vm")
             
 
             loadFile(os.path.join(args[0], file))
             Parser.parseFile()
-            print(codeGen.output)
 
             # File Creation
             f = open(args[0]+"\\"+os.path.splitext(file)[0]+".vm", "w")
@@ -77,8 +76,18 @@ def main(args):
     compile code and generate file
     '''
 
-main(["Pong"]) # Compiler test
+main(["test//ComplexArrays!!!"]) # Compiler test
 
-# # Code to run the program from command line 
-# if __name__ == "__main__":
-#     main(sys.argv[1:])
+
+
+
+# # # Code to run the program from command line 
+# # if __name__ == "__main__":
+# #     main(sys.argv[1:])
+
+
+
+# # Code to auto-compile all sets for testing
+# for file in os.listdir("test"):
+#     # print()
+#     main(["test\\"+file]) # Compiler test

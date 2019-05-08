@@ -231,7 +231,6 @@ def main(token):
                                 elif symbolTable[0][symbolTable[1].index(token[1])] == functionReturnType:
                                     pass
                                 else:
-                                    print(symbolTable)
                                     Error(stack[-1],"function type and return don't match")
 
                             else:                            
@@ -304,8 +303,6 @@ def main(token):
                             if varScope in functionStack[0]:
                                 return # Variable in scope
                             else:
-                                print(symbolTable)
-                                print(token)
                                 Error(token,"variable used outside scope")                # If variable is being used outside scope log error
 
                         else:
