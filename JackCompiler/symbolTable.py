@@ -5,18 +5,16 @@ from codeGen import *
 
 #             type, symbol, index, scope, attribute (data type)
 symbolTable = [[],    [],    [],    [],     []]
-
 symbolIndexList = [[],[]]
+staticVarCount = 0
 def addSymbol(*args,**kwargs):
 
     symbolType = kwargs.get("type",0)
-    # # Check context the symbol is being mentioned in 
-    # if objectName == "":                            # if referenced from static context
-    #     if kwargs.get("attribute",0)=="static":     # if declared as static
-    #         symbolType="static"
-
-    #     else:
-    #         symbolType="static"
+    # Check context the symbol is being mentioned in 
+    if objectName == "":                            # if referenced from static context
+        if kwargs.get("type",0) not in ["static", "argument", "local", "this", "that", "pointer", "temp", "const"]:     # if declared as static
+            global staticVarCount
+            staticVarCount+=1
 
 
 
@@ -64,7 +62,7 @@ def pushPop(token):
             varIndex = symbolTable[2][symbolIndex]
             varType  = symbolTable[0][symbolIndex]
 
-            
+
             if varType not in ["static", "argument", "local", "this", "that", "pointer", "temp", "const"]:
                 varType = "this"
 
@@ -179,7 +177,7 @@ def expressionToCode(expr):
  
                 pushData = pushPop(token)
                 print("\n\n\n")
-                print(symbolTable)
+                print("ahh")
                 text("push "+pushData[0]+" "+str(pushData[1]))
 
             if pos>1:
@@ -248,38 +246,41 @@ def exprFunctionRunParam(funcParam):
 def exprFunctionHandler(expr):
 
 
-
-    # Get num of args (to be used when calling the function)
-    if expr[1][1]==[]:
-        argCount = 0
-    else:
-        argCount = 1
-
-    # print("\n\n",expr, argCount)
-
-    # Get a parameter from the function and run the expression to generate it's code
-    funcParam = []
-    for item in expr[1][1]:
-        if item[1]==",":
-            exprFunctionRunParam(funcParam) # run expr
-            funcParam = []
-            argCount+=1
-            # print(funcParam)
+    def handleParams(expr):
+        # Get num of args (to be used when calling the function)
+        if expr[1][1]==[]:
+            argCount = 0
         else:
-            funcParam.append(item)
+            argCount = 1
 
-    exprFunctionRunParam(funcParam) # run final expr
+        # print("\n\n",expr, argCount)
+
+        # Get a parameter from the function and run the expression to generate it's code
+        funcParam = []
+        for item in expr[1][1]:
+            if item[1]==",":
+                exprFunctionRunParam(funcParam) # run expr
+                funcParam = []
+                argCount+=1
+                # print(funcParam)
+            else:
+                funcParam.append(item)
+
+        exprFunctionRunParam(funcParam) # run final expr
 
 
-
+        return argCount
 
 
 
     # Check if method exists in current file      
     if expr[1][0][1] in methodList:
+        print("\n\n\n","waddup")
+        print(expr)
         global className
         text("push pointer 0 ")
-        text("call "+className+"."+expr[1][0][1]+" "+str(argCount))
+        argCount = handleParams(expr)
+        text("call "+className+"."+expr[1][0][1]+" "+str(argCount+1))
     else:
         # Assume method exists as lib or external function
         callSplit = expr[1][0][1].split(".")
@@ -292,23 +293,24 @@ def exprFunctionHandler(expr):
                 pushData = pushPop([expr[1][0][0],callSplit[0],expr[1][0][2]])
                 text("push "+pushData[0]+" "+str(pushData[1]))                  # <<< DOUBLE CHECK + 1 IS RIGHT
 
-
-
+                argCount = handleParams(expr)
+                print("\n\n",argCount)
                     
                 if len(callSplit)==2:
                     text("call "+symbolTable[4][i]+"."+callSplit[1]+" "+str(argCount+1))# <<< DOUBLE CHECK + 1 IS RIGHT
                 else:
                     text("call "+symbolTable[4][i]+" "+str(argCount+1))
 
-                if symbolTable[4][i]=="field":
-                    print("pushData: ",pushData)
-                    print(callSplit)
-                    exit()
+                # if symbolTable[4][i]=="field":
+                #     print("pushData: ",pushData)
+                #     print(callSplit)
+                #     exit()
                 # if (symbolTable[4][i]+"."+callSplit[1]) == "Fraction.getNumerator":
                 #     exit()
                 return
 
 
+        argCount = handleParams(expr)
 
         text("call "+expr[1][0][1]+" "+str(argCount))
 

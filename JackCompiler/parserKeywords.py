@@ -41,7 +41,7 @@ def constructor(token):     # Check function is of correct type
     attribute = token[1]
 
     setObjectName()
-    text("push constant "+str(constructorPushConstant))
+    text("push constant "+str(symbolTable.staticVarCount))
 
     # Alloc memory
     text("call Memory.alloc 1")
@@ -246,7 +246,7 @@ def var(token):
     return createVar(token, attribute, 0)
 
 
-constructorPushConstant = 0
+
 def createVar(token, attribute, context):
 
     # Check syntax of variables and add them to the symbol table
@@ -263,13 +263,14 @@ def createVar(token, attribute, context):
                     # print("     ",token, attribute,objectType)
                     # exit()
                     if objectType == "": # If refrenced from static context
+                        # global symbolTable.staticVarCount
+                        # symbolTable.staticVarCount+=1
+                        print("             ", token, attribute, context, symbolTable.staticVarCount)
                         symbolTable.addSymbol(type=context, attribute=attribute, symbol=token[1], scope=symbolTable.objectName)
                     else:
                         symbolTable.addSymbol(type="local", attribute=attribute, symbol=token[1], scope=symbolTable.objectName)
 
-                    if objectType == "":
-                        global constructorPushConstant
-                        constructorPushConstant+=1
+                    # if objectType == "":
                         
                 tokenSwitch = 0
             else:        
