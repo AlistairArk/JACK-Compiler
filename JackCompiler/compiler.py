@@ -1,16 +1,16 @@
+'''
+
+
+
+
+'''
 import lexer, Parser, semanticAnalyser, symbolTable, codeGen, parserKeywords
-
-
 import sys, os, getopt
 
 def loadFile(filename):
-
     ''' load the file '''
     lexer.file = open(filename, "r").read()+" " # Loads the test file
     lexer.fileLen = len(lexer.file)
-    # print(filename)
-    # print(lexer.file)
-    # exit()
 
 
     ''' Reset Global Vars '''
@@ -20,8 +20,6 @@ def loadFile(filename):
     lexer.posTemp = 0
     lexer.lineNumTemp=0
 
-
-
     #             type, symbol, index, scope, attribute (data type)
     symbolTable.symbolTable = [[],    [],    [],    [],     []]
     symbolTable.symbolIndexList = [[],[]]
@@ -29,6 +27,7 @@ def loadFile(filename):
     symbolTable.methodList = []
     symbolTable.className = ""
     symbolTable.objectName = ""
+    symbolTable.arrayLetSwitch
 
     #                 {  (  [
     symbolTable.bracketPointer = [1, 1, 1]
@@ -36,47 +35,36 @@ def loadFile(filename):
     symbolTable.labelCounter   = [ 0,    0,    0]       # Increment counter as new labels are created
     symbolTable.labelStack = []                         # Close loops as they are created
 
-
     codeGen.output = ""
-
     parserKeywords.objectType = ""
 
 
 def main(args):
-    print(args)
+
+    if not os.path.isdir(args[0]): # If file not found
+        print("Error: The system cannot find the path specified: '"+args[0]+"'")
+
+    else:
+        print("Compiling files in '"+args[0]+"'")
+        for file in os.listdir(args[0]):
+            if file.endswith(".jack"):
+                print("     Now compiling '"+file+"'")
+
+                # Compile file
+                loadFile(os.path.join(args[0], file))
+                Parser.parseFile()
+
+                # File Creation
+                f = open(args[0]+"\\"+os.path.splitext(file)[0]+".vm", "w")
+                f.write(codeGen.output)
+                f.close()
 
 
 
-    for file in os.listdir(args[0]):
-        if file.endswith(".jack"):
-            # print(os.path.join(args[0], file), file)
-
-            print("\n",args[0]+"\\"+os.path.splitext(file)[0]+".vm")
-            
-            print(args[0])
-            loadFile(os.path.join(args[0], file))
-            Parser.parseFile()
-
-            # File Creation
-            f = open(args[0]+"\\"+os.path.splitext(file)[0]+".vm", "w")
-            f.write(codeGen.output)
-            f.close()
 
 
 
-
-
-
-
-    # loadFile(args[0])
-    # semanticAnalyser.analyseSemantic()
-
-    # loadFile(args[0])
-    '''
-    compile code and generate file
-    '''
-
-# main(["test//List!!!"]) # Compiler test
+main(["test//test"]) # Compiler test
 
 
 
@@ -87,7 +75,7 @@ def main(args):
 
 
 
-# Code to auto-compile all sets for testing
-for file in os.listdir("test"):
-    # print()
-    main(["test\\"+file]) # Compiler test
+# # Code to auto-compile all sets for testing
+# for file in os.listdir("test"):
+#     # print()
+#     main(["test\\"+file]) # Compiler test

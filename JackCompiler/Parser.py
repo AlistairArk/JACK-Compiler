@@ -1,44 +1,18 @@
 '''
-Assignment: Milestone 2. The Parser
 
-So far, I have created a lexer and parser. The two components have been conected together and function properly with one another. 
-The program does not crash or become unstable if the source file contains any kind of lexical errors, and if there are any the parser succesfully flags them where necessary. 
 
-Both the lexer and parser have been tested using the provided JACK source files and are shown to function properly without any issues. 
-'''
-
-import lexer, parserKeywords, codeGen, symbolTable
-
-'''
 note:
     token[0] = type
     token[1] = lexeme
     token[2] = line number
+
 '''
-
-
- 
-
-def Error(*args):
-    print("Error in line " + str(args[0][2]) + " at or near " + str(args[0][1])+ ", " + str(args[1]));
-
-
-
-
-def Init(file_name):
-    pass
-
-
-
-
-
-def OK(token):
-    pass
+import lexer, parserKeywords, symbolTable
+from codeGen import *
 
 
 
 def parseFile():
-
     '''
     Generate a list of methods to later be used in function calls
     '''
@@ -56,15 +30,6 @@ def parseFile():
     while (token[0] != "EOF"):
         stmt(token)
         token = lexer.getNextToken()
-        print(token)
-
-    # print("\n===== ===== ===== ===== ===== ===== ===== =====\n")
-    # print(codeGen.output)
-
-    # # File Creation
-    # f = open("source.vm", "w")
-    # f.write(codeGen.output)
-    # f.close()
 
 
 
@@ -80,40 +45,28 @@ def stmt(token):
         else:
             Error(token, "unknown keyword")
 
-        if data[0]:
-            OK(token) # Accept the token
-        else:
+        if not data[0]:
             Error(token, data[1])
 
 
     elif token[0] in "symbol":
         if token[1] in lexer.symbols:        
             data = parserKeywords.symbol(token) 
-            if data[0]:
-                OK(token) # Accept the token
-            else:
+            if not data[0]:
                 Error(token, data[1])
         else:
             Error(token, "unknown symbol")
 
 
     elif token[0] in "operator":        
-        if token[1] in lexer.operators:        
-            OK(token) # be happy
+        if token[1] in lexer.operators:
+            pass
+
         else:
             Error(token, "unknown operator")
   
-    elif token[0] in "id": 
-        OK(token) # be happy
-
-
-
-    elif token[0] in "number":        
-        OK(token) # be happy
-
-    elif token[0] in "string_literal":        
-        OK(token) # be happy
-
+    elif token[0] in ["id","number","string_literal"]:        
+        pass
 
 
     else:
@@ -159,4 +112,4 @@ keywords = {"class":parserKeywords.Class ,
             }
 
 
-# parseFile()
+

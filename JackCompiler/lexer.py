@@ -1,15 +1,9 @@
-''' 
-Assignment: Milestone 1. Lexical Analysis
-
-So far, I have created a lexer which successfully removes white space and comments from the input file 
-and correctly extracts all the tokens of the source code. It does not crash or become unstable if the 
-source file contains any kind of lexical errors. 
-
-The lexer has been tested using the provided JACK source files and is shown to function 
-properly without any issues. 
 '''
+Lexer
 
 
+
+'''
 
 # # file = list(shlex.shlex(open("source.jack", "r").read())) # Loads the test file
 file = 0            # open("tall.jack", "r").read()+" " # Loads the test file
@@ -59,8 +53,6 @@ def getNextToken():
         peekFlag = 0
 
     token = consumeToken()
-    # semanticAnalyser.main(token) # Peform semantic analysis while consuming tokens
-    # print(token)
     return token
 
 
@@ -134,14 +126,6 @@ def consumeToken():
                 lexeme+=file[pos]
                 pos+=1
 
-        # if file[pos]=="[": # Check if is array
-        #     lexeme = [lexeme,""]
-        #     while file[pos]!="]":
-        #         lexeme[1]+=file[pos]
-        #         pos+=1
-
-        #     return ["id",lexeme,lineNum]
-        # else:
 
         if lexeme in tokens[tokenType.index("keyword")]:
             return ["keyword",lexeme,lineNum]
@@ -168,10 +152,6 @@ def consumeToken():
         if C in tokens[i]:
             return [tokenType[i],C,lineNum] 
 
-    # if C == "\n":
-    #     lineNum+=1 # incriment line counter
-    #     return consumeToken() # Get next token
-    # else:
     return ["symbol",C,lineNum]
         
     
@@ -200,4 +180,3 @@ def main():
         print("".join(str(word).ljust(20) for word in token)) # print token
         token = getNextToken()
 
-# main()

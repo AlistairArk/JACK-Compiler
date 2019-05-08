@@ -1,4 +1,9 @@
+'''
 
+
+
+
+'''
 import lexer
 
 #             type, symbol, declared flag, scope
@@ -98,7 +103,6 @@ def main(token):
     global classFlag, function, parentheses, semicolon
     stack.append(token)
 
-    # print("     ",token)
     if token[1] == "{":
         semicolon += 1
 
@@ -270,27 +274,14 @@ def main(token):
 
                     # var, comma, var, comma, var, 
                     if (item[1] in varType):
-                        # if not alternate:
-                            addSymbol(type=item[1], symbol=token[1], flag=1, scope=functionStack[0][-1])
-                            break
-                        # else:
-                        #     Error(token,"invalid alt 1")
+                        addSymbol(type=item[1], symbol=token[1], flag=1, scope=functionStack[0][-1])
+                        break
                         
                     elif item[1]==",":
                         pass
-                        # print("comma")
-                        # if alternate:
-                        #     alternate = 0
-                        # else:
-                        #     Error(token,"invalid alt 2")
 
                     elif item[0] == "id" or item[1]==".":
                         pass
-                        # print("id")
-                        # if not alternate:
-                        #     alternate = 1
-                        # else:
-                        #     Error(token,"invalid alt 3")
                         
                     else:
 
@@ -342,25 +333,4 @@ def main(token):
         # Ensure the next token is the end of a function or condition
         if lexer.peekNextToken()[1] != "}":
             Error(token, "unreachable code")
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
-'''
-EVERYTHING BELOW THIS LINE IS INTENDED TO BE USED IN TESTING THE SEMANTIC ANALYSER 
-
-The following will take a list of tokens and input them into the semantic analyser.
-
-'''
-
 
