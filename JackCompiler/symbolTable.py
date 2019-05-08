@@ -128,7 +128,9 @@ def operatorToCode(token):
         text("call Math.divide 2")
 
 
-arrayDepth = 0
+arrayDepth  = 0
+arraySwitch = 0
+arrayLetSwitch = 0
 def expressionToCode(expr):
 
     exprLen = len(expr)    # Get the length of the expression
@@ -146,7 +148,7 @@ def expressionToCode(expr):
             text("call String.appendChar 2")
         return
 
-    elif expr[0][0] in ["id","number","array","function"] or expr[0][1] in ["this","true","false"]:
+    elif expr[0][0] in ["id","number","array","function"] or expr[0][1] in ["this","true","false","null"]:
         exprSwitch=0
     
     # print(expr)
@@ -169,16 +171,51 @@ def expressionToCode(expr):
 
             if token[0]=="array":
                 print("pass")
-                exprArrayHandler(token)
 
-                # for item in [token[1][0],token[1][1],["operator","+",token[2]]]:
-                #     expressionToCode([item])
-                global arrayDepth
-                if arrayDepth:
+                global arrayLetSwitch
+                print("\n\nAHH",arrayLetSwitch)
+                if arrayLetSwitch:
+
+                    popPushSwitch = 0
+                    for item in token[1][1]:
+                        print(item[1], "==", "[")
+                        if item[1]=="[":
+                            print("ahh")
+                            popPushSwitch = 1
+                            print(popPushSwitch)
+                    print("\n\nSwitch state: ",popPushSwitch)
+
+                    exprArrayHandler(token)
+
+
+                    if popPushSwitch: # Ensure this only runs on bottommost depth of 
+                        text("pop pointer 1")
+                        text("push that 0")
+
+                    print("Switch state: ",popPushSwitch)
+                    print("fin")
+
+                    # exit()
+                else:
+                    # popPushSwitch = 1
+                    # for item in token[1][1]:
+                        # print(item[1], "==", "[")
+                        # if item[1]=="[":
+                            # print("ahh")
+                            # popPushSwitch = 0
+                            # print(popPushSwitch)
+
+
+                    exprArrayHandler(token)
+
+
+                    # if popPushSwitch: # Ensure this only runs on bottommost depth of 
                     text("pop pointer 1")
                     text("push that 0")
 
-                print("fin")
+                    print("WOWEE")
+
+
             elif token[0]=="function":
                 exprFunctionHandler(token)
 
@@ -189,6 +226,9 @@ def expressionToCode(expr):
                 text("push constant 0")
                 if token[1]=="true":
                     text("not")
+            
+            elif token[1]=="null":
+                text("push constant 0")
 
             else:
  
@@ -335,7 +375,6 @@ def exprArrayHandler(expr):
     pushData = pushPop(expr[1][0])
     text("push "+pushData[0]+" "+str(pushData[1]))
     text("add")
-    text("")
     arrayDepth-=1
     return
 

@@ -329,7 +329,9 @@ def let(token):
 
         print("\n\n")
         print(expr)
+        symbolTable.arrayLetSwitch = 1
         symbolTable.expressionToCode(expr)
+        symbolTable.arrayLetSwitch = 0
 
         # for item in [lexer.getNextToken(),token,["operator","+",token[2]]]:
 
