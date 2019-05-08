@@ -53,7 +53,7 @@ def main(args):
 
             print("\n",args[0]+"\\"+os.path.splitext(file)[0]+".vm")
             
-
+            print(args[0])
             loadFile(os.path.join(args[0], file))
             Parser.parseFile()
 
@@ -76,7 +76,7 @@ def main(args):
     compile code and generate file
     '''
 
-main(["test//ComplexArrays!!!"]) # Compiler test
+main(["test//List!!!"]) # Compiler test
 
 
 

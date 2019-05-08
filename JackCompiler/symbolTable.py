@@ -295,6 +295,7 @@ def exprFunctionRunParam(funcParam):
                 expr[-1][0]="function"
                 expr[-1][1] = [expr[-1].copy(), []] # store function with arguments
                 bCount = 1
+                print(">>>>>",funcParam)
                 while bCount: #and counter!=len(funcParam):   # Exit on obtaining all content in brackets 
                     counter+=1
 
@@ -340,8 +341,15 @@ def exprFunctionHandler(expr):
 
         # Get a parameter from the function and run the expression to generate it's code
         funcParam = []
+        bCount= 0
         for item in expr[1][1]:
-            if item[1]==",":
+
+            if item[1]=="(":
+                bCount+=1
+            elif item[1]==")":
+                bCount-=1
+
+            if item[1]=="," and not bCount:
                 exprFunctionRunParam(funcParam) # run expr
                 funcParam = []
                 argCount+=1
@@ -568,7 +576,7 @@ def runExpr(expr):
         if neg and expr[i][1] == "-":           # Set neg if neg enabled
                 print("\n\n",expr)
                 print(i)
-                exit()
+
                 expr[i][1] = "neg"
                 neg = 0
 
