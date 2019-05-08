@@ -58,9 +58,22 @@ def pushPop(token):
     else:
         # Get data for popping    
         if token[1] in symbolTable[1]:
-            symbolIndex = symbolTable[1].index(token[1])
-            varIndex = symbolTable[2][symbolIndex]
-            varType  = symbolTable[0][symbolIndex]
+
+            # Prioritize symbols declared within scope
+            symbolFound = 0
+            print(token, symbolTable,objectName)
+            for i in range(len(symbolTable[0])):
+                # if symbol found, and, symbol is in scope 
+                if symbolTable[1][i]==token[1] and symbolTable[3][i]==objectName:
+                    symbolFound = 1
+                    print("found!!")
+                    varIndex = symbolTable[2][i]
+                    varType  = symbolTable[0][i]
+
+            if not symbolFound: # if symbol could not be found within current scope, default to last declaration OR THROW ERROR
+                symbolIndex = symbolTable[1].index(token[1])
+                varIndex = symbolTable[2][symbolIndex]
+                varType  = symbolTable[0][symbolIndex]
 
 
             if varType not in ["static", "argument", "local", "this", "that", "pointer", "temp", "const"]:

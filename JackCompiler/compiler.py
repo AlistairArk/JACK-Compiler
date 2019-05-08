@@ -19,10 +19,10 @@ def main(args):
     loadFile(args[0])
     Parser.parseFile()
 
-    loadFile(args[0])
-    semanticAnalyser.analyseSemantic()
+    # loadFile(args[0])
+    # semanticAnalyser.analyseSemantic()
 
-    loadFile(args[0])
+    # loadFile(args[0])
     '''
     compile code and generate file
     '''
