@@ -63,7 +63,6 @@ def resetSymbolIndexList():
 
 def pushPop(token):
 
-
     if token[0]=="number":
         return ["constant", token[1]]
     else:
@@ -79,6 +78,11 @@ def pushPop(token):
                     # print("found!!")
                     varIndex = symbolTable[2][i]
                     varType  = symbolTable[0][i]
+
+            # if token[1]=="size":
+            #     print("\n\n",varIndex,varType,symbolTable)
+            #     exit()
+
 
             if not symbolFound: # if symbol could not be found within current scope, default to last declaration OR THROW ERROR
                 symbolIndex = symbolTable[1].index(token[1])
@@ -173,29 +177,45 @@ def expressionToCode(expr):
                 print("pass")
 
                 global arrayLetSwitch
-                print("\n\nAHH",arrayLetSwitch)
+
                 if arrayLetSwitch:
 
                     popPushSwitch = 0
                     for item in token[1][1]:
-                        print(item[1], "==", "[")
+                        # print(item[1], "==", "[")
                         if item[1]=="[":
-                            print("ahh")
+
                             popPushSwitch = 1
                             print(popPushSwitch)
                     print("\n\nSwitch state: ",popPushSwitch)
 
-                    exprArrayHandler(token)
+                    # exprArrayHandler(token)
+
+                    expr = token
+                    
+                    counter = 0
+
+                    exprFunctionRunParam(expr[1][1])
+                    pushData = pushPop(expr[1][0])
+                    print(popPushSwitch)
 
 
                     if popPushSwitch: # Ensure this only runs on bottommost depth of 
                         text("pop pointer 1")
                         text("push that 0")
+                        text("push "+pushData[0]+" "+str(pushData[1]))
+                        text("add")
 
-                    print("Switch state: ",popPushSwitch)
-                    print("fin")
+                    else:
+                        text("push "+pushData[0]+" "+str(pushData[1]))
+                        text("add")
 
-                    # exit()
+                    print("\n\n")
+                    # print("Switch state: ",popPushSwitch)
+                    # print("fin")
+
+
+
                 else:
                     # popPushSwitch = 1
                     # for item in token[1][1]:
@@ -206,7 +226,19 @@ def expressionToCode(expr):
                             # print(popPushSwitch)
 
 
-                    exprArrayHandler(token)
+                    # exprArrayHandler(token)
+                    expr = token
+
+
+                    print(expr)
+                    # expr = []
+                    counter = 0
+
+                    exprFunctionRunParam(expr[1][1])
+                    pushData = pushPop(expr[1][0])
+                    text("push "+pushData[0]+" "+str(pushData[1]))
+                    text("add")
+
 
 
                     # if popPushSwitch: # Ensure this only runs on bottommost depth of 
@@ -530,6 +562,25 @@ def runExpr(expr):
 
 
 
+    # Discern sub between neg and overwrite token
+    neg = 1 # While true convert all '-' to 'neg'
+    for i in range(len(expr)):
+        if neg and expr[i][1] == "-":           # Set neg if neg enabled
+                print("\n\n",expr)
+                print(i)
+                exit()
+                expr[i][1] = "neg"
+                neg = 0
+
+        elif expr[i][0] in ["id","number","function","array"] or (expr[i][0]=="symbol" and expr[i][1] in [")","]","}"]):     # Disable neg if number
+            neg = 0
+
+        elif expr[i][0]=="operator" or (expr[i][0]=="symbol" and expr[i][1] in ["(","[","{"]) : 
+            # Enable neg if operator or symbol is encountered
+            neg = 1
+
+
+
 
     '''
     # Check for divisions
@@ -560,21 +611,10 @@ def runExpr(expr):
 
 
 
-    # Discern sub between neg and overwrite token
-    neg = 1 # While true convert all '-' to 'neg'
-    for i in range(len(expr)):
-        if neg and expr[i][1] == "-":           # Set neg if neg enabled
-                expr[i][1] = "neg"
-                neg = 0
-
-        elif expr[i][0] in ["id","number"]:     # Disable neg if number
-            neg = 0
-
-        elif expr[i][1] in lexer.operators and expr[i][0]=="operator":      # Enable neg if operator is encountered         # == "=":  # Enable neg if equal
-            neg = 1
 
 
-
+    print(expr)
+    # exit()
 
 
 

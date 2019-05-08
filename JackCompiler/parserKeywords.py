@@ -79,6 +79,8 @@ def function(token): # function int mult
     global objectType
     objectType = "function"
 
+    symbolTable.symbolIndexList = [[],[]] # Reset symbolIndexList on creation of new object
+    
     # Check function is of correct type
     token = lexer.getNextToken()
     if not token[1] in ["int", "boolean", "char", "void", symbolTable.className] and token[0] != "keyword": # Class name can be used in constructors
