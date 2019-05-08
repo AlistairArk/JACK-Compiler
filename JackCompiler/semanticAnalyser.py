@@ -5,6 +5,17 @@ import lexer
 
 symbolTable = [[],    [],        [],        []]
 
+classFlag = 0    # Detects when the program is in a class
+function  = 0    # Detects when the program is in a function
+parentheses = 0  # 
+semicolon = 0    # 
+
+conditionalFlag = 0
+
+stack = []
+#               function , level
+functionStack = [[0],[0]]
+
 
 # JACK - Standard Library (Built in functions)
 stdlib = [  ["Math",
@@ -81,16 +92,7 @@ def Error(*args):
     exit()
 
 
-classFlag = 0    # Detects when the program is in a class
-function  = 0    # Detects when the program is in a function
-parentheses = 0  # 
-semicolon = 0    # 
 
-conditionalFlag = 0
-
-stack = []
-#               function , level
-functionStack = [[0],[0]]
 
 def main(token):
     global classFlag, function, parentheses, semicolon

@@ -1,12 +1,22 @@
 import lexer
 from codeGen import *
-
+import copy
 
 
 #             type, symbol, index, scope, attribute (data type)
 symbolTable = [[],    [],    [],    [],     []]
 symbolIndexList = [[],[]]
 staticVarCount = 0
+methodList = []
+className = ""
+objectName = ""
+
+#                 {  (  [
+bracketPointer = [1, 1, 1]
+#                 if, else, while
+labelCounter   = [ 0,    0,    0]       # Increment counter as new labels are created
+labelStack = []                         # Close loops as they are created
+
 def addSymbol(*args,**kwargs):
 
     symbolType = kwargs.get("type",0)
@@ -123,9 +133,7 @@ def operatorToCode(token):
         text("call Math.divide 2")
 
 
-methodList = []
-className = ""
-objectName = ""
+
 def expressionToCode(expr):
 
     exprLen = len(expr)    # Get the length of the expression
@@ -335,7 +343,7 @@ def exprFunctionHandler(expr):
 
     return
 
-import copy
+
 def orderExpr(exprType):
     ''' Obtains a list of tokens which comprise an expression '''
 
@@ -550,11 +558,7 @@ def runExpr(expr):
 
 
 
-#                 {  (  [
-bracketPointer = [1, 1, 1]
-#                 if, else, while
-labelCounter   = [ 0,    0,    0]  # Increment counter as new labels are created
-labelStack = []       # Close loops as they are created
+
 def newLabel(labelType):
     global labelCounter
 

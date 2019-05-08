@@ -61,10 +61,10 @@ def parseFile():
     # print("\n===== ===== ===== ===== ===== ===== ===== =====\n")
     # print(codeGen.output)
 
-    # File Creation
-    f = open("source.vm", "w")
-    f.write(codeGen.output)
-    f.close()
+    # # File Creation
+    # f = open("source.vm", "w")
+    # f.write(codeGen.output)
+    # f.close()
 
 
 
@@ -159,4 +159,4 @@ keywords = {"class":parserKeywords.Class ,
             }
 
 
-parseFile()
+# parseFile()

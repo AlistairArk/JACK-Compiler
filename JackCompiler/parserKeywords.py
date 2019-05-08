@@ -2,10 +2,6 @@ import lexer, symbolTable
 # from symbolTable import *
 from codeGen import *
 
-tokenStack = []
-
-
-
 
 
 

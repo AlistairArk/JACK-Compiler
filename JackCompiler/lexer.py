@@ -12,11 +12,13 @@ properly without any issues.
 
 
 # # file = list(shlex.shlex(open("source.jack", "r").read())) # Loads the test file
-file = open("source.jack", "r").read()+" " # Loads the test file
+file = open("tall.jack", "r").read()+" " # Loads the test file
 fileLen = len(file)
 pos = -1
 lineNum = 1
-
+peekFlag = 0
+posTemp = 0
+lineNumTemp = 0
 
 tokenType = ["keyword","operator","symbol"] # ,"integer_number","identifier","punctuator"]
 
@@ -68,7 +70,7 @@ def consumeToken():
 
 
     # Skip any white space characters until you hit the first non-whitespace character (call it C).
-    while file[pos]==" ":
+    while file[pos]==" " or file[pos]=="\t":
         pos+=1 # Incriment pointer
         if pos >= fileLen:
             # If the integer code for C = -1, then it is the end of file symbol, hence return an EOF token. 
@@ -174,9 +176,7 @@ def consumeToken():
         
     
 
-peekFlag = 0
-posTemp = 0
-lineNumTemp = 0
+
 def peekNextToken():
     '''When this function is called it will return the next available token in the input stream, but the token is not consumed (i.e. it will stay in the input). So, the next time the parser calls GetNextToken, or PeekNextToken, it gets this same token.'''
     global pos, peekFlag, posTemp, lineNumTemp
