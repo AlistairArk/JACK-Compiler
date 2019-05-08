@@ -20,8 +20,13 @@ def addSymbol(*args,**kwargs):
 
     # Add new type to list of indexes as encountered
     if not symbolType in symbolIndexList[0]:
-        symbolIndexList[0].append(symbolType) 
+        symbolIndexList[0].append(symbolType)
         symbolIndexList[1].append(-1)
+        # if kwargs.get("type",0)=="argument":
+        #     symbolIndexList[1].append(0)        # Function args start from index 1
+        # else:
+        #     symbolIndexList[1].append(-1)       # All other args start at index 0
+
 
     symbolIndex = symbolIndexList[0].index(symbolType)
     symbolIndexList[1][symbolIndex] += 1 # Incriment index

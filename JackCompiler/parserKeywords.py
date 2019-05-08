@@ -64,6 +64,12 @@ def method(token):          # Check method is of correct type
 
     setObjectName()
 
+
+    symbolTable.symbolIndexList = [[],[]] # Reset symbolIndexList on creation of new object
+
+    #Function header is the first argument to be added to the symbol table
+    symbolTable.addSymbol(type="argument", attribute=attribute, symbol=symbolTable.className+"."+symbolTable.objectName, scope=symbolTable.objectName)
+
     # Push argument
     text("push argument 0")
     text("pop pointer 0")
@@ -150,7 +156,6 @@ def setObjectName():
 
 def setObjectArgs(attribute):
     
-    symbolTable.symbolIndexList = [[],[]] # Reset symbolIndexList on creation of new object
 
     token = lexer.getNextToken()
     if token[1]!="(":
