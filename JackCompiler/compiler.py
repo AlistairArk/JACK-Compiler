@@ -76,7 +76,7 @@ def main(args):
     compile code and generate file
     '''
 
-main(["test//List!!!"]) # Compiler test
+# main(["test//List!!!"]) # Compiler test
 
 
 
@@ -87,7 +87,7 @@ main(["test//List!!!"]) # Compiler test
 
 
 
-# # Code to auto-compile all sets for testing
-# for file in os.listdir("test"):
-#     # print()
-#     main(["test\\"+file]) # Compiler test
+# Code to auto-compile all sets for testing
+for file in os.listdir("test"):
+    # print()
+    main(["test\\"+file]) # Compiler test
