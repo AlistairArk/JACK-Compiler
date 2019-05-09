@@ -323,7 +323,7 @@ pop local 4
 goto IF_END0
 label IF_FALSE0
 push constant 1
-sub
+neg
 push this 2
 push constant 0
 lt
@@ -359,7 +359,7 @@ label IF_TRUE2
 push constant 506
 pop local 0
 push constant 50
-sub
+neg
 push local 3
 call Math.multiply 2
 push local 2
@@ -404,7 +404,7 @@ label IF_TRUE4
 push constant 250
 pop local 1
 push constant 25
-sub
+neg
 push local 2
 call Math.multiply 2
 push local 3

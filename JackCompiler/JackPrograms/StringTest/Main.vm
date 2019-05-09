@@ -103,7 +103,7 @@ call Output.println 0
 pop temp 0
 push local 1
 push constant 32767
-sub
+neg
 call String.setInt 2
 pop temp 0
 push constant 8

@@ -425,7 +425,7 @@ def runExpr(expr):
     # Discern sub between neg and overwrite token
     neg = 1 # While true convert all '-' to 'neg'
     for i in range(len(expr)):
-        if neg and (expr[i][1] == "-" and expr[i][0]=="symbol"):           # Set neg if neg enabled
+        if neg and (expr[i][1] == "-" and expr[i][0]=="operator"):           # Set neg if neg enabled
                 expr[i][1] = "neg"
                 neg = 0
 

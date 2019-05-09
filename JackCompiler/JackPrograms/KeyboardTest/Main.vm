@@ -863,7 +863,7 @@ call String.appendChar 2
 call Keyboard.readInt 1
 pop local 3
 push constant 32123
-sub
+neg
 push local 3
 eq
 if-goto IF_TRUE4

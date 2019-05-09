@@ -244,7 +244,7 @@ pop temp 0
 call Output.println 0
 pop temp 0
 push constant 12345
-sub
+neg
 call Output.printInt 1
 pop temp 0
 call Output.backSpace 0

@@ -272,7 +272,7 @@ if-goto IF_TRUE3
 goto IF_FALSE3
 label IF_TRUE3
 push constant 1
-sub
+neg
 pop local 0
 goto IF_END0
 label IF_FALSE3
