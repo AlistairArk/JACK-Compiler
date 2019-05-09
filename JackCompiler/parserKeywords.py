@@ -95,7 +95,7 @@ def setObjectName():
     # Check function has appropriate type and name
     token = lexer.getNextToken()
     if token[0] != "id":
-        Error(token, "'id' expected")
+        Error(token, "Expected 'id'")
 
     # Reset counter and set new name on entry to new object
     symbolTable.objectName = token[1]
@@ -124,13 +124,13 @@ def setObjectName():
                 if token[1]!=";":
                     if tokenSwitch:
                         if token[0]!="id":
-                            Error(token,"Identifier expected")
+                            Error(token,"Expected token of type 'identifier'")
                         else:
                             varCount+=1
                         tokenSwitch = 0
                     else:        
                         if token[0]!="symbol" and token[1]!="," :
-                            Error(token,"Symbol expected")
+                            Error(token,"Expected ','")
                         else:
                             tokenSwitch = 1
                 eof(token)
@@ -144,13 +144,17 @@ def setObjectName():
 
     text("function "+symbolTable.className+"."+symbolTable.objectName+" "+str(varCount))
 
-
+returnList = []
 def setObjectArgs(attribute):
-    
+
+    # Log bracket count when entering a function so you can later tell when the function is exited
+    #                       function name,           bracket pointer,    value returned     
+    returnList.append([symbolTable.objectName, symbolTable.bracketPointer[0], 0])
+
 
     token = lexer.getNextToken()
     if token[1]!="(":
-        Error(token, "'(' expected")
+        Error(token, "Expected '('")
 
 
     if lexer.peekNextToken()[1]==")":   # Check if function has no arguments
@@ -187,7 +191,7 @@ def setObjectArgs(attribute):
 
     token = lexer.peekNextToken()
     if token[1]!="{":
-        return [0, "'{' expected"]
+        Error(token, "Expected '{'")
 
     return [1]
 
@@ -271,7 +275,7 @@ def let(token):
 
     token = lexer.getNextToken()
     if token[0]!="id":
-        return [0, "'id' expected"]
+        return [0, "Expected 'id'"]
 
 
 
@@ -303,7 +307,7 @@ def let(token):
 
 
         if lexer.getNextToken()[1]!="=":
-            return [0, "'=' expected"]
+            return [0, "Expected '='"]
 
         returnData = symbolTable.orderExpr("let")
         if not returnData[0]:
@@ -319,7 +323,7 @@ def let(token):
         popData = symbolTable.pushPop(token)
 
         if lexer.getNextToken()[1]!="=":
-            return [0, "'=' expected"]
+            return [0, "Expected '='"]
 
         returnData = symbolTable.orderExpr("let")
         if not returnData[0]:
@@ -358,7 +362,7 @@ def If(token):
 def Else(token):
 
     if lexer.peekNextToken()[1]!="{":
-        return [0, "'{' expected"]
+        Error(token, "Expected '{'")
     
     return [1]
 
@@ -385,14 +389,16 @@ def While(token):
 
 def Return(token):
 
-    token = lexer.peekNextToken()
+    if len(returnList):
+        returnList[-1][2]=1
 
+    token = lexer.peekNextToken()
     if token[1]==";":
         lexer.getNextToken() # consume the token
         # No value to be returned, just push const 0
         text("push constant 0")
         if lexer.peekNextToken()[1]!="}":
-            Error(token, "Warning: Unreachable code")
+            Error(token, "Unreachable code")
         
 
     elif token[0] in ["id","number"]:
@@ -431,6 +437,14 @@ def symbol(token):
         symbolTable.bracketPointer[0]+=1
     if token[1]=="}":
         symbolTable.bracketPointer[0]-=1
+
+        # Verify last function exited has a return
+        if len(returnList) and (symbolTable.bracketPointer[0]==returnList[-1][1]):
+            if not returnList[-1][2]:
+                Error(token, "In subroutine '"+returnList[-1][0]+"': Program flow may reach end of subroutine without 'return'")
+            # returnList.pop()
+
+
         if not symbolTable.bracketPointer[0]:
             Error(token, "Mismatched number of braces")
         else:

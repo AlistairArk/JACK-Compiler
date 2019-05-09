@@ -133,6 +133,7 @@ def operatorToCode(token):
 def expressionToCode(expr):
     exprLen = len(expr)    # Get the length of the expression
 
+
     # Check what type the expression starts with
     if expr[0][0] == "operator":
         exprSwitch=1
@@ -173,11 +174,10 @@ def expressionToCode(expr):
                         if item[1]=="[":
                             popPushSwitch = 1
 
-                    expr = token
                     counter = 0
 
-                    exprFunctionRunParam(expr[1][1])
-                    pushData = pushPop(expr[1][0])
+                    exprFunctionRunParam(token[1][1])
+                    pushData = pushPop(token[1][0])
 
                     if popPushSwitch: # Ensure this only runs on bottommost depth of 
                         text("pop pointer 1")
@@ -190,11 +190,10 @@ def expressionToCode(expr):
                         text("add")
 
                 else:
-                    expr = token
                     counter = 0
 
-                    exprFunctionRunParam(expr[1][1])
-                    pushData = pushPop(expr[1][0])
+                    exprFunctionRunParam(token[1][1])
+                    pushData = pushPop(token[1][0])
                     text("push "+pushData[0]+" "+str(pushData[1]))
                     text("add")
                     text("pop pointer 1")

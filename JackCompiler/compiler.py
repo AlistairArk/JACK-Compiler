@@ -64,7 +64,7 @@ def main(args):
 
 
 
-main(["test//test"]) # Compiler test
+main(["test//MathTest"]) # Compiler test
 
 
 
