@@ -76,16 +76,16 @@ def main(args):
             f.close()
 
 
-# # Code to run the program from command line
-# if __name__ == "__main__":
-#     try:
-#         main(sys.argv[1:])
-#     except Exception as e:
-#         print("Compiler Error: File failed to compile")
+# Code to run the program from command line
+if __name__ == "__main__":
+    try:
+        main(sys.argv[1:])
+    except Exception as e:
+        print("Compiler Error: File failed to compile")
 
 
 # main(["JackPrograms//ArrayTest//Main.jack"]) # Compiler test
 
-# Code to auto-compile all sets for testing
-for file in os.listdir("JackPrograms"):
-    main(["JackPrograms//"+file]) # Compiler test
+# # Code to auto-compile all sets for testing
+# for file in os.listdir("JackPrograms"):
+#     main(["JackPrograms//"+file]) # Compiler test
