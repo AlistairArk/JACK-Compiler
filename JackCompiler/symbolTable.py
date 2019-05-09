@@ -1,9 +1,8 @@
 '''
-The following function is used for handling the following
-    - Generating a symbol table
-    - Code generation for maths expressions
+Symbol Table
 
-
+- Handels main code generation for expressions & referenced variables
+- Various checks are handled throughout
 '''
 import lexer
 from codeGen import *

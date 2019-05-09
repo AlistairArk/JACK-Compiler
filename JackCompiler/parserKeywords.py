@@ -1,8 +1,8 @@
 '''
+Parser Keywords
 
-
-
-
+- Parser routes to functions in this file as keywords are encountered
+- Semantic analysis / basic code generation occurs on this level
 '''
 import lexer, symbolTable
 from codeGen import *

@@ -1,4 +1,9 @@
+'''
+Code Gen
 
+- Handles error printing
+- Logs VM code as it is generated
+'''
 output = ""
 
 def text(dialogue):

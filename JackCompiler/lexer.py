@@ -1,7 +1,7 @@
 '''
 Lexer
 
-
+- Scans a given file and returns tokens to a calling function
 
 '''
 
