@@ -4,7 +4,7 @@
 
 
 '''
-from data import lexer, Parser, symbolTable, codeGen, parserKeywords
+import lexer, Parser, symbolTable, codeGen, parserKeywords
 import sys, os, getopt
 
 def loadFile(filename):
