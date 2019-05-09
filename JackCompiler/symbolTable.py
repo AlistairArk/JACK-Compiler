@@ -29,7 +29,7 @@ labelStack = []                         # Close loops as they are created
 def addSymbol(*args,**kwargs):
 
     symbolType = kwargs.get("type",0)
-    # Check context the symbol is being mentioned in 
+    # Check context the symbol is being mentioned in
     if objectName == "":                            # if referenced from static context
         if kwargs.get("type",0) not in ["static", "argument", "local", "this", "that", "pointer", "temp", "const"]:     # if declared as static
             global staticVarCount
@@ -66,14 +66,14 @@ def pushPop(token):
     if token[0]=="number":
         return ["constant", token[1]]
     else:
-        # Get data for popping    
+        # Get data for popping
         if token[1] in symbolTable[1]:
 
             # Prioritize symbols declared within scope
             symbolFound = 0
             for i in range(len(symbolTable[0])):
 
-                # if symbol found, and, symbol is in scope 
+                # if symbol found, and, symbol is in scope
                 if symbolTable[1][i]==token[1] and symbolTable[3][i]==objectName:
                     symbolFound = 1
 
@@ -100,7 +100,7 @@ def pushPop(token):
 
 def operatorToCode(token):
     # ["+","-","*","/","&","|","~","<",">"]
-    
+
     if token[1] == "+":
         text("add")
     elif token[1] == "-":
@@ -148,7 +148,7 @@ def expressionToCode(expr):
 
     elif expr[0][0] in ["id","number","array","function"] or expr[0][1] in ["this","true","false","null"]:
         exprSwitch=0
-    
+
     operator = ""
     pos=0
     for token in expr:
@@ -160,10 +160,10 @@ def expressionToCode(expr):
             #     Error(token, "Syntax Error: Invalid type in expression. 'operator' expected")
 
             operator=token
-            if pos==len(expr):          # if end of expression is reached 
+            if pos==len(expr):          # if end of expression is reached
                 operatorToCode(token)   # output token
 
-        else:            
+        else:
             exprSwitch = 1
             if token[0]=="array":
 
@@ -179,7 +179,7 @@ def expressionToCode(expr):
                     exprFunctionRunParam(token[1][1])
                     pushData = pushPop(token[1][0])
 
-                    if popPushSwitch: # Ensure this only runs on bottommost depth of 
+                    if popPushSwitch: # Ensure this only runs on bottommost depth of
                         text("pop pointer 1")
                         text("push that 0")
                         text("push "+pushData[0]+" "+str(pushData[1]))
@@ -209,7 +209,7 @@ def expressionToCode(expr):
                 text("push constant 0")
                 if token[1]=="true":
                     text("not")
-            
+
             elif token[1]=="null":
                 text("push constant 0")
 
@@ -239,10 +239,10 @@ def exprFunctionRunParam(funcParam):
             # Check if next token implies the current token is a function call
             if funcParam[counter-1][0]=="id" and funcParam[counter][1]=="(" and funcParam[counter][0]=="symbol":
                 expr[-1][0]="function"
-                expr[-1][1] = [expr[-1].copy(), []] # store function with arguments
+                expr[-1][1] = [copy.copy(expr[-1]), []] # store function with arguments
                 bCount = 1
 
-                while bCount: #and counter!=len(funcParam):   # Exit on obtaining all content in brackets 
+                while bCount: #and counter!=len(funcParam):   # Exit on obtaining all content in brackets
                     counter+=1
 
                     if funcParam[counter][1]=="(":
@@ -256,9 +256,9 @@ def exprFunctionRunParam(funcParam):
             # Check if next token implies the current token is array
             elif funcParam[counter-1][0]=="id" and funcParam[counter][1]=="[" and funcParam[counter][0]=="symbol":
                 expr[-1][0]="array"
-                expr[-1][1] = [expr[-1].copy(), []] # store function with arguments
+                expr[-1][1] = [copy.copy(expr[-1]), []] # store function with arguments
                 bCount = 1
-                while bCount: #and counter!=len(funcParam):   # Exit on obtaining all content in brackets 
+                while bCount: #and counter!=len(funcParam):   # Exit on obtaining all content in brackets
                     counter+=1
 
                     if funcParam[counter][1]=="[":
@@ -300,7 +300,7 @@ def exprFunctionHandler(expr):
         exprFunctionRunParam(funcParam) # run final expr
         return argCount
 
-    # Check if method exists in current file      
+    # Check if method exists in current file
     if expr[1][0][1] in methodList:
         global className
         text("push pointer 0 ")
@@ -319,7 +319,7 @@ def exprFunctionHandler(expr):
                 text("push "+pushData[0]+" "+str(pushData[1]))                  # <<< DOUBLE CHECK + 1 IS RIGHT
 
                 argCount = handleParams(expr)
-                    
+
                 if len(callSplit)==2:
                     text("call "+symbolTable[4][i]+"."+callSplit[1]+" "+str(argCount+1))# <<< DOUBLE CHECK + 1 IS RIGHT
                 else:
@@ -359,10 +359,10 @@ def orderExpr(exprType):
     elif exprType in ["return"]:
         ending = ";"
         token = [token[0],"return",token[2]]
-        
+
 
     while token[1]!=ending:
-        
+
         token = lexer.getNextToken()    # Consume token
         if token[0] == "EOF":
             Error(errorToken, "Unexpected EOF")
@@ -378,14 +378,14 @@ def orderExpr(exprType):
 
         if bracketOpenCount==-1:
             Error(errorToken, "Mismatched number of parenthesis")
-        
+
         lastToken = token
         token = lexer.peekNextToken()
         # Check if next token implies the current token is a function call
         if lastToken[0]=="id" and token[1]=="(":
             lexer.getNextToken()                    # consume token
             expr[-1][0]="function"
-            expr[-1][1] = [expr[-1].copy(), []]     # store function with arguments
+            expr[-1][1] = [copy.copy(expr[-1]), []]     # store function with arguments
             bCount = 1
             while bCount:   # Exit on obtaining all parameters
                 token = lexer.getNextToken()
@@ -403,7 +403,7 @@ def orderExpr(exprType):
         elif lastToken[0]=="id" and token[1]=="[":
             lexer.getNextToken()                    # consume token
             expr[-1][0]="array"
-            expr[-1][1] = [expr[-1].copy(), []]     # store function with arguments
+            expr[-1][1] = [copy.copy(expr[-1]), []]     # store function with arguments
             bCount = 1
             while bCount:                           # Exit on obtaining all parameters
                 token = lexer.getNextToken()
@@ -434,7 +434,7 @@ def runExpr(expr):
         elif expr[i][0] in ["id","number","function","array"] or (expr[i][0]=="symbol" and expr[i][1] in [")","]","}"]):     # Disable neg if number
             neg = 0
 
-        elif expr[i][0]=="operator" or (expr[i][0]=="symbol" and expr[i][1] in ["(","[","{"]) : 
+        elif expr[i][0]=="operator" or (expr[i][0]=="symbol" and expr[i][1] in ["(","[","{"]) :
             # Enable neg if operator or symbol is encountered
             neg = 1
 
@@ -442,12 +442,12 @@ def runExpr(expr):
     '''
     # Check for divisions
     The following will ensure expressions RHS of a '/' take president
-    over the LHS as the order of code generation is important 
+    over the LHS as the order of code generation is important
     '''
     counter = 0
     lastBracketOpen = 0
-    while counter!=len(expr):# Loop through expression. 
-  
+    while counter!=len(expr):# Loop through expression.
+
         # if '/' or '-' encountered bracket LHS items so they take precedent
         if expr[counter][0]=="operator":
             if (expr[counter][1]=="/" or expr[counter][1]=="-"):
@@ -468,8 +468,8 @@ def runExpr(expr):
 
 
     '''
-    Calculates depth of parenthesized expressions 
-    in order to handle them in the correct order. 
+    Calculates depth of parenthesized expressions
+    in order to handle them in the correct order.
     '''
     result = [[[],0]]
     depth = 0
@@ -517,7 +517,7 @@ def runExpr(expr):
 
     while len(result):
         if pos==len(result)-1 or result[pos+1][1]<=depth:
-            # Generate code in order of expressions 
+            # Generate code in order of expressions
             expressionToCode(result[pos][0])
             result.remove(result[pos])
 
@@ -534,7 +534,7 @@ def runExpr(expr):
                     if result[count][1]>depth:
                         depth = result[count][1]
                         pos = count
-        else: 
+        else:
             pos+=1
     return[1]
 
@@ -553,11 +553,3 @@ def newLabel(labelType):
     elif labelType=="while":
         labelStack.append([str(labelCounter[2]), bracketPointer[0], labelType]) # Store label name, scope, type (if or while)
         labelCounter[2]+=1
-
-    
-
-
-
-
-
-

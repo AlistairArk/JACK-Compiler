@@ -5,6 +5,7 @@
 
 '''
 import lexer, symbolTable
+import copy
 from codeGen import *
 
 objectType = ""
@@ -128,7 +129,7 @@ def setObjectName():
                         else:
                             varCount+=1
                         tokenSwitch = 0
-                    else:        
+                    else:
                         if token[0]!="symbol" and token[1]!="," :
                             Error(token,"Expected ','")
                         else:
@@ -148,7 +149,7 @@ returnList = []
 def setObjectArgs(attribute):
 
     # Log bracket count when entering a function so you can later tell when the function is exited
-    #                       function name,           bracket pointer,    value returned     
+    #                       function name,           bracket pointer,    value returned
     returnList.append([symbolTable.objectName, symbolTable.bracketPointer[0], 0])
 
 
@@ -167,20 +168,20 @@ def setObjectArgs(attribute):
         while token[1]!=")":
             token = lexer.getNextToken()
 
-            
+
             if token[0] not in expectedTypeList[expectedTypePointer]:
 
                 Error(token, "Expected a type followed by a variable name")
-            
+
             elif expectedTypePointer == 0:
                 pass
 
-            
+
             elif expectedTypePointer == 1: # add variable to symbol table
                     symbolTable.addSymbol(type="argument",attribute=attribute, symbol=token[1], scope="")
 
             elif expectedTypePointer == 2:
-                if not token[1] in [",", ")"]: 
+                if not token[1] in [",", ")"]:
                     Error(token, "Expected ')' or ',' in parameters list")
 
             # incriment pointer
@@ -235,7 +236,7 @@ def var(token):
 
     if not token[1] in ["int", "boolean", "char", "void", "Array"] and token[0]!="id":
         return [0, "declared variable is of invalid type"]
-    
+
     attribute = token[1]
     return createVar(token, attribute, 0)
 
@@ -245,7 +246,7 @@ def createVar(token, attribute, context):
 
     # Check syntax of variables and add them to the symbol table
     tokenSwitch = 1 # Switch between checking for id and symbol with each loop
-    
+
     while token[1]!=";":
         token = lexer.getNextToken()
         if token[1]!=";":
@@ -257,9 +258,9 @@ def createVar(token, attribute, context):
                         symbolTable.addSymbol(type=context, attribute=attribute, symbol=token[1], scope=symbolTable.objectName)
                     else:
                         symbolTable.addSymbol(type="local", attribute=attribute, symbol=token[1], scope=symbolTable.objectName)
-                        
+
                 tokenSwitch = 0
-            else:        
+            else:
                 if token[0]!="symbol" and token[1]!="," :
                     Error(token, "Symbol expected")
                 else:
@@ -280,13 +281,13 @@ def let(token):
 
 
     if lexer.peekNextToken()[1]=="[": # Check if array
-        
+
         expr = [token] # Stores list of tokens in expression
 
         lexer.getNextToken() # consume token
 
         expr[-1][0]="array"
-        expr[-1][1] = [expr[-1].copy(), []] # store function with arguments
+        expr[-1][1] = [copy.copy(expr[-1]), []] # store function with arguments
         bCount = 1
         while bCount:   # Exit on obtaining all parameters
             token = lexer.getNextToken()
@@ -348,7 +349,7 @@ def do(token):
 
 
 def If(token):
-    symbolTable.newLabel("if")                      
+    symbolTable.newLabel("if")
     symbolTable.orderExpr("if")                     # (Generate expression code)
 
     text("if-goto IF_TRUE"+symbolTable.labelStack[-1][0])
@@ -363,7 +364,7 @@ def Else(token):
 
     if lexer.peekNextToken()[1]!="{":
         Error(token, "Expected '{'")
-    
+
     return [1]
 
 
@@ -371,11 +372,11 @@ def Else(token):
 
 def While(token):
     symbolTable.newLabel("while")
-    
-    text("label WHILE_EXP"+symbolTable.labelStack[-1][0])   
+
+    text("label WHILE_EXP"+symbolTable.labelStack[-1][0])
     symbolTable.orderExpr("while")                      # Generate expression code
 
-    # Go to end of loop if condition is false 
+    # Go to end of loop if condition is false
     text("not")
     text("if-goto WHILE_END"+symbolTable.labelStack[-1][0])
 
@@ -399,7 +400,7 @@ def Return(token):
         text("push constant 0")
         if lexer.peekNextToken()[1]!="}":
             Error(token, "Unreachable code")
-        
+
 
     elif token[0] in ["id","number"]:
         # Return expression
@@ -462,7 +463,7 @@ def symbol(token):
 
                         peekToken = lexer.peekNextToken()
                         if peekToken[1]=="else":
-                            symbolTable.newLabel("else") 
+                            symbolTable.newLabel("else")
                             text("goto IF_END"+symbolTable.labelStack[-1][0])
 
                         text("label IF_FALSE"+item[0])
@@ -492,5 +493,3 @@ def symbol(token):
 
 
     return[1]
-
-

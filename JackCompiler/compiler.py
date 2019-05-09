@@ -41,7 +41,10 @@ def loadFile(filename):
 
 def main(args):
 
-    if not os.path.isdir(args[0]): # If file not found
+    if not len(args):
+        print("Error: No arguments supplied to compiler")
+        
+    elif not os.path.isdir(args[0]): # If file not found
         print("Error: The system cannot find the path specified: '"+args[0]+"'")
 
     else:
@@ -55,7 +58,7 @@ def main(args):
                 Parser.parseFile()
 
                 # File Creation
-                f = open(args[0]+"\\"+os.path.splitext(file)[0]+".vm", "w")
+                f = open(args[0]+"//"+os.path.splitext(file)[0]+".vm", "w")
                 f.write(codeGen.output)
                 f.close()
 
@@ -64,18 +67,18 @@ def main(args):
 
 
 
-# main(["test//MathTest"]) # Compiler test
+# main(["test//Square"]) # Compiler test
 
 
 
 
-# # # Code to run the program from command line 
-# # if __name__ == "__main__":
-# #     main(sys.argv[1:])
+# Code to run the program from command line
+if __name__ == "__main__":
+    main(sys.argv[1:])
 
 
 
-# Code to auto-compile all sets for testing
-for file in os.listdir("test"):
-    # print()
-    main(["test\\"+file]) # Compiler test
+# # Code to auto-compile all sets for testing
+# for file in os.listdir("test"):
+#     # print()
+#     main(["test//"+file]) # Compiler test
