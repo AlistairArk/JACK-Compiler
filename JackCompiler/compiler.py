@@ -4,7 +4,7 @@
 
 
 '''
-import lexer, Parser, semanticAnalyser, symbolTable, codeGen, parserKeywords
+from data import lexer, Parser, symbolTable, codeGen, parserKeywords
 import sys, os, getopt
 
 def loadFile(filename):
@@ -67,14 +67,14 @@ def main(args):
 
 
 
-# main(["test//Square"]) # Compiler test
+main(["test//Square"]) # Compiler test
 
 
 
 
-# Code to run the program from command line
-if __name__ == "__main__":
-    main(sys.argv[1:])
+# # Code to run the program from command line
+# if __name__ == "__main__":
+#     main(sys.argv[1:])
 
 
 
