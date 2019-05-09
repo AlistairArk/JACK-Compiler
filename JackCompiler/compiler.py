@@ -64,7 +64,7 @@ def main(args):
 
 
 
-main(["test//MathTest"]) # Compiler test
+# main(["test//MathTest"]) # Compiler test
 
 
 
@@ -75,7 +75,7 @@ main(["test//MathTest"]) # Compiler test
 
 
 
-# # Code to auto-compile all sets for testing
-# for file in os.listdir("test"):
-#     # print()
-#     main(["test\\"+file]) # Compiler test
+# Code to auto-compile all sets for testing
+for file in os.listdir("test"):
+    # print()
+    main(["test\\"+file]) # Compiler test
